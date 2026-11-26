@@ -195,6 +195,50 @@ body.night .nx { color: #94A3B8; }
 @keyframes mp { 0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,122,26,.6); } 50% { transform: scale(1.06); box-shadow: 0 0 0 22px rgba(255,122,26,0); } }
 .micpulse { animation: mp 1.4s ease-in-out infinite; }
 #app::after { content: ''; display: block; height: 110px; }
+.nav.dock { left: 10px; right: 10px; bottom: calc(env(safe-area-inset-bottom) + 6px); background: rgba(255,255,255,.72); -webkit-backdrop-filter: saturate(180%) blur(22px); backdrop-filter: saturate(180%) blur(22px); border: 1px solid rgba(0,0,0,.08); border-radius: 28px; padding: 7px 6px 6px; gap: 0; box-shadow: 0 10px 30px rgba(0,0,0,.18), 0 1px 0 rgba(255,255,255,.8) inset; }
+.nav.dock button { background: none; border: 0; border-radius: 16px; padding: 0; min-height: 62px; color: #111; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px; font-family: Barlow, Roboto, sans-serif; letter-spacing: 0; box-shadow: none; }
+.nav.dock button .di { width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center; color: #111; box-shadow: 0 2px 6px rgba(0,0,0,.18), inset 0 -2px 0 rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.5); filter: saturate(.55) brightness(1.05); opacity: .78; transition: transform .15s, opacity .15s, filter .15s; }
+.nav.dock button .dl { font-size: 9.5px; font-weight: 800; line-height: 1; color: #6B7280; white-space: nowrap; }
+.nav.dock button.on .di { filter: none; opacity: 1; transform: translateY(-2px) scale(1.06); box-shadow: 0 6px 14px rgba(0,0,0,.25), inset 0 -2px 0 rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.6); }
+.nav.dock button.on .dl { color: #111; }
+.nav.dock button.on::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #111; margin-top: -1px; }
+.nav.dock button:active .di { transform: scale(.92); }
+body.night .nav.dock { background: rgba(20,20,28,.72); border-color: rgba(255,255,255,.1); }
+body.night .nav.dock button .dl { color: #9CA3AF; } body.night .nav.dock button.on .dl { color: #fff; } body.night .nav.dock button.on::after { background: #fff; }
+.hhero { background: var(--ink); color: #fff; padding: calc(env(safe-area-inset-top) + 12px) 16px 14px; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
+.hhero small { color: #FACC15; font-weight: 800; letter-spacing: .12em; font-size: 12px; }
+.hh1 { font-size: 34px; line-height: 1; margin-top: 2px; } .hh1 span { color: #FF7A1A; }
+.hupd { border: 2px solid #FACC15; border-radius: 99px; background: none; color: #FACC15; font-weight: 800; font-size: 12px; padding: 6px 10px; min-height: 34px; white-space: nowrap; }
+.hday { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; } .hday span { background: rgba(255,255,255,.12); border-radius: 99px; padding: 3px 9px; font-size: 12px; font-weight: 800; color: #E5E7EB; } .hday span.ok { background: #22C55E; color: #111; }
+.hsec { padding: 10px 16px 0; }
+.hrow { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; } .ht { font-size: 18px; }
+.hlnk { border: 0; background: none; font-weight: 800; font-size: 13px; text-decoration: underline; min-height: 32px; padding: 0 0 0 10px; color: #111; }
+.scard { width: 100%; display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 2px; border: 3px solid #111; border-radius: 20px; padding: 12px 14px; box-shadow: 4px 4px 0 #111; color: #111; position: relative; font: inherit; }
+.scard .sk { font-weight: 800; font-size: 11.5px; letter-spacing: .1em; } .scard .st { font-size: 28px; line-height: 1.02; } .scard .ss { font-weight: 700; font-size: 13.5px; line-height: 1.25; } .scard .sw { font-size: 12.5px; font-weight: 600; opacity: .85; line-height: 1.25; margin-top: 2px; }
+.scard .sgo { margin-top: 8px; align-self: stretch; display: flex; align-items: center; justify-content: center; gap: 6px; background: #111; color: #fff; border-radius: 14px; min-height: 44px; font-family: Anton, Impact, sans-serif; font-size: 19px; letter-spacing: .02em; }
+.wrow { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 8px; margin: 0 -2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; } .wrow::-webkit-scrollbar { display: none; }
+.wdg { flex: 0 0 74px; height: 78px; border: 2.5px solid #111; border-radius: 18px; background: #fff; box-shadow: 2px 2px 0 #111; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 4px; font: inherit; color: #111; }
+.wdg .wi { display: flex; } .wdg .wn { font-family: Anton, Impact, sans-serif; font-size: 18px; line-height: 1; font-weight: 400; } .wdg .wn small { font-size: 11px; font-family: Barlow, Roboto, sans-serif; font-weight: 800; }
+.wdg .wl { font-size: 9.5px; font-weight: 800; line-height: 1.1; text-align: center; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.wdg.wat { flex-basis: 80px; }
+.ecard { width: 100%; display: flex; align-items: center; gap: 12px; border: 3px solid #111; border-radius: 20px; background: #111; color: #fff; padding: 10px 14px; box-shadow: 4px 4px 0 #FF7A1A; font: inherit; }
+.ecard .eplus { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 14px; background: #FF7A1A; color: #111; font-size: 30px; display: flex; align-items: center; justify-content: center; }
+.emini { display: flex; align-items: center; gap: 8px; margin-top: 5px; font-size: 12px; font-weight: 800; } .emini span { flex: 0 0 auto; min-width: 128px; } .emini i { flex: 1; height: 7px; border-radius: 9px; background: rgba(255,255,255,.18); overflow: hidden; } .emini em { display: block; height: 100%; border-radius: 9px; }
+.prow { display: flex; gap: 6px; flex-wrap: wrap; } .prow button { border: 2.5px solid #111; border-radius: 99px; font: inherit; font-weight: 800; font-size: 14px; padding: 6px 12px; min-height: 42px; color: #111; }
+
+.hbelow { padding-top: 22px; display: flex; flex-direction: column; gap: 10px; }
+.mini { width: 100%; background: #fff; border: 2px solid #E5E7EB; border-radius: 18px; padding: 10px 12px; font: inherit; color: #111; text-align: left; }
+.mini .mq { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 15px; margin-bottom: 8px; }
+.mrow { display: flex; justify-content: space-between; align-items: center; min-height: 56px; } .mrow small { display: block; font-weight: 800; font-size: 11px; letter-spacing: .1em; color: #6B7280; } .mrow b { font-size: 16px; } .mrow .d { font-size: 22px; }
+.mini .prow button { background: #fff; font-size: 13px; min-height: 38px; padding: 4px 11px; }
+.hday { gap: 5px; margin-top: 8px; flex-wrap: nowrap; overflow: hidden; } .hday span { font-size: 11px; padding: 3px 7px; white-space: nowrap; }
+.hsec { padding: 14px 16px 0; }
+.nav.dock button .di { filter: saturate(.8); opacity: .92; }
+
+.hhero { align-items: flex-start; position: relative; } .hhero > div { min-width: 0; flex: 1; }
+.hupd { width: 38px; height: 38px; min-height: 38px; padding: 0; font-size: 18px; display: flex; align-items: center; justify-content: center; flex: 0 0 38px; }
+.hday { overflow-x: auto; scrollbar-width: none; } .hday::-webkit-scrollbar { display: none; }
+html, body { overflow-x: hidden; }
 .wsolo button { aspect-ratio: auto !important; min-height: 96px; }
 .swthumb svg { width: 100% !important; height: auto !important; display: block; }
 #printzone { display: none; }
@@ -1509,7 +1553,7 @@ document.addEventListener('click', function (ev) { var b = ev.target.closest && 
   if (b.dataset.bib) { var q2 = b.dataset.bib.split('|'); BIB[q2[0]] = q2[1]; var y = window.scrollY; route(); window.scrollTo(0, y); }
 });
 /* ---- version + mise à jour ---- */
-var APPVER = '2026.11.26-1305';
+var APPVER = '2026.11.26-1326';
 function updToast() { if (ST.appver && ST.appver !== APPVER) { var t = document.createElement('div'); t.textContent = '✓ Mise à jour installée'; t.style.cssText = 'position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);z-index:30;background:#22C55E;color:#111;border:3px solid #111;border-radius:99px;padding:10px 18px;font-weight:800;box-shadow:3px 3px 0 #111'; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3500); } if (ST.appver !== APPVER) { ST.appver = APPVER; save(); } }
 applySwaps();
 function swapsFresh() { if (JSON.stringify([ST.swap || {}, ST.aswap || {}, ST.prog || null]) !== SWSIG) applySwaps(); }
@@ -2156,6 +2200,70 @@ function codes() {
   h += '<div class="sec"><button type="button" class="btn" data-adm="off" style="width:100%">Désactiver le mode créateur sur ce téléphone</button></div>';
   return h;
 }
+
+/* ================= ACCUEIL : séance du jour + widgets + j'ai mangé, visibles sans défiler ================= */
+var ICO = {
+  pill: '<path d="M9.5 4.5a4.95 4.95 0 0 1 7 7l-5 5a4.95 4.95 0 0 1-7-7z"/><path d="M7 7l7 7"/>',
+  scoop: '<path d="M4 10h11v3a5.5 5.5 0 0 1-11 0z"/><path d="M15 11.5h5"/><path d="M7 7c0-1.5 1-2.5 2.5-2.5S12 5.5 12 7"/>',
+  shaker: '<path d="M7 8h10l-1.2 12H8.2z"/><path d="M8 8V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V8"/><path d="M8.6 13h6.8"/>',
+  leaf: '<path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19l7-7"/>',
+  med: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/>',
+  drop: '<path d="M12 3.5s6 6.4 6 10.5a6 6 0 0 1-12 0c0-4.1 6-10.5 6-10.5z"/>',
+  home: '<path d="M4 11l8-6.5 8 6.5"/><path d="M6.5 9.5V19h4v-5h3v5h4V9.5"/>',
+  dumb: '<path d="M3 10v4M6 8v8M18 8v8M21 10v4M6 12h12"/>',
+  food: '<path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8M9 3v8"/><path d="M17 21V3c-2 1-3 4-3 7s1 3 3 3"/>',
+  moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1-4 4-6 7.5-6s6.5 2 7.5 6"/>',
+  play: '<path d="M8 5.5v13l11-6.5z" fill="currentColor"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>'
+};
+function ico(k, sz, sw) { return '<svg viewBox="0 0 24 24" width="' + (sz || 24) + '" height="' + (sz || 24) + '" fill="none" stroke="currentColor" stroke-width="' + (sw || 2.2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICO[k] + '</svg>'; }
+function wdg(attr, on, icon, top, lab, col) { return '<button type="button" class="wdg' + (on ? ' on' : '') + '" ' + attr + ' aria-pressed="' + !!on + '" style="' + (on ? 'background:' + col : '') + '"><span class="wi">' + (on ? ico('check', 22, 3) : ico(icon, 22)) + '</span>' + (top !== '' ? '<b class="wn">' + top + '</b>' : '') + '<span class="wl">' + lab + '</span></button>'; }
+function widgetsRow(f, T) { var c = prisCfg(), w = [];
+  if (c.multi) w.push(wdg('data-compl="multi"', f.compl.multi, 'pill', '', 'VITAMINES', '#86EFAC'));
+  if (c.crea) w.push(wdg('data-compl="crea"', f.compl.crea, 'scoop', '', 'CRÉATINE', '#86EFAC'));
+  if (c.shaker) { var on = (f.log || []).some(function (e) { return e.id === 'shaker'; }); w.push(wdg('data-shaker="1"', on, 'shaker', '', 'SHAKER ' + c.shg + ' G', '#FDBA74')); }
+  c.supps.forEach(function (m) { var on2 = !!(f.meds && f.meds[m.id]); w.push(wdg('data-med="' + m.id + '"', on2, 'leaf', '', esc(m.n).toUpperCase(), '#86EFAC')); });
+  c.meds.forEach(function (m) { var on3 = !!(f.meds && f.meds[m.id]); w.push(wdg('data-med="' + m.id + '"', on3, 'med', '', esc(m.n).toUpperCase(), '#C4B5FD')); });
+  var wd = f.water >= T.w;
+  var water = '<button type="button" class="wdg wat' + (wd ? ' on' : '') + '" data-water="1" style="' + (wd ? 'background:#BFDBFE' : '') + '"><span class="wi" style="color:#2563EB">' + ico('drop', 22) + '</span><b class="wn">' + f.water + '<small>/' + T.w + '</small></b><span class="wl">VERRES D\'EAU</span></button>';
+  return '<div class="hsec"><div class="hrow"><span class="ht d">J\'AI PRIS</span><span>' + (f.water ? '<button type="button" data-water="-1" class="hlnk">− 1 verre</button>' : '') + '<button type="button" data-go="profil" class="hlnk">régler</button></span></div><div class="wrow">' + water + w.join('') + '</div></div>'; }
+function sessionCard(ck) { var ss = suggestSession(), m = getMode();
+  if (!ss.done && !ss.rest && ck.c && ck.c.sleep === 'bad' && ck.c.energy === 'low') ss = { rest: true, txt: 'Nuit courte et batterie à plat : mobilité aujourd\'hui, la séance ' + ss.L + ' demain.' };
+  if (ss.done) return '<button type="button" class="scard" data-go="suivi" style="background:#fff"><span class="sk">SÉANCE DU JOUR</span><span class="st d">✓ FAITE, BRAVO</span><span class="ss">' + esc(ss.txt) + '</span></button>';
+  if (ss.rest) return '<button type="button" class="scard" data-play="daily" style="background:#99F6E4"><span class="sk">SÉANCE DU JOUR</span><span class="st d">REPOS ACTIF</span><span class="ss">' + esc(ss.txt) + '</span><span class="sgo">' + ico('play', 18) + ' MOBILITÉ 17 MIN</span></button>';
+  var S = ss.s, ex = S.ex.slice(0, 3).map(function (z, i) { var e = z[m] || z.home, pr = presc(e.p, key(ss.L, i, m)); return esc(pr.name || e.name).toLowerCase(); }).join(' · ') + (S.ex.length > 3 ? ' · +' + (S.ex.length - 3) : '');
+  return '<button type="button" class="scard" data-startrun="' + ss.L + '" style="background:' + S.color + '"><span class="sk">SÉANCE DU JOUR · ' + esc(S.time) + '</span><span class="st d">' + ss.L + ' · ' + esc(S.word) + '</span><span class="ss">' + ex + '</span>' + (/allégée|légère|perso/.test(recoWhy(ss.L)) ? '<span class="sw">' + esc(recoWhy(ss.L)) + '</span>' : '') + '<span class="sgo">' + ico('play', 18) + ' DÉMARRER</span></button>'; }
+function eatCard(E, T) { var M = macroTargets(T), pk = Math.min(100, Math.round(E.k / Math.max(1, M.k) * 100)), pp = Math.min(100, Math.round(E.p / Math.max(1, M.p) * 100));
+  return '<button type="button" class="ecard" data-eat="1"><span class="eplus d">+</span><span style="flex:1;min-width:0;text-align:left"><span class="d" style="display:block;font-size:22px;line-height:1">J\'AI MANGÉ…</span><span class="emini"><span>' + E.k + ' / ' + M.k + ' kcal</span><i><em style="width:' + pk + '%;background:#4ADE80"></em></i></span><span class="emini"><span>' + E.p + ' / ' + M.p + ' g protéines</span><i><em style="width:' + pp + '%;background:#FB923C"></em></i></span></span></button>'; }
+function dayChips(f, T, E) { var c = prisCfg(), tot = 0, ok = 0;
+  if (c.multi) { tot++; if (f.compl.multi) ok++; } if (c.crea) { tot++; if (f.compl.crea) ok++; } if (c.shaker) { tot++; if ((f.log || []).some(function (e) { return e.id === 'shaker'; })) ok++; }
+  c.supps.concat(c.meds).forEach(function (m) { tot++; if (f.meds && f.meds[m.id]) ok++; });
+  var done = trainedToday(), M = macroTargets(T);
+  return '<div class="hday"><span class="' + (done ? 'ok' : '') + '">' + (done ? '✓ séance' : '○ séance') + '</span>' + (tot ? '<span class="' + (ok === tot ? 'ok' : '') + '">' + (ok === tot ? '✓' : '○') + ' compléments ' + ok + '/' + tot + '</span>' : '') + '<span class="' + (f.water >= T.w ? 'ok' : '') + '">' + (f.water >= T.w ? '✓' : '○') + ' eau ' + f.water + '/' + T.w + '</span></div>'; }
+function jour() {
+  var p = prof(), f = food(), T = targets(f), E = eaten(f), h = '', ck = checkin();
+  h += '<div class="hhero"><div><small>' + new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase() + '</small><div class="d hh1">SALUT <span>' + esc(String(p.prenom).toUpperCase()) + '</span></div>' + dayChips(f, T, E) + '</div><button type="button" data-upd="1" class="hupd" aria-label="Mettre à jour l\'appli">⟳</button></div>';
+  h += '<div class="hsec" style="padding-top:12px">' + sessionCard(ck) + '</div>';
+  h += widgetsRow(f, T);
+  h += '<div class="hsec">' + eatCard(E, T) + '</div>';
+  /* ---- en dessous : le strict nécessaire, une ligne chacun ---- */
+  var below = '';
+  if (!f.posteSet) below += '<div class="mini"><span class="mq">Quel poste aujourd\'hui ?</span><div class="prow">' + ['matin', 'apm', 'nuit', 'jour', 'repos'].map(function (k) { return '<button type="button" data-poste="' + k + '">' + POSTES[k].n + '</button>'; }).join('') + '</div></div>';
+  var todo = CKQ.filter(function (q) { return !(ck.c || {})[q[0]]; })[0];
+  if (ck.q && todo) below += '<div class="mini"><span class="mq">' + todo[1] + ' <button type="button" data-ckskip="1" class="hlnk">passer</button></span><div class="prow">' + todo[2].map(function (o) { return '<button type="button" data-ck="' + todo[0] + '|' + o[0] + '" style="background:' + o[2] + '">' + o[1] + '</button>'; }).join('') + '</div></div>';
+  var nx = nextSlot(f);
+  if (nx) below += '<button type="button" class="mini mrow" data-slot="' + nx[0] + '"><span><small>PROCHAIN REPAS · ' + nx[1] + '</small><b>' + FOOD[nx[0]].n + '</b></span><span class="d">›</span></button>';
+  var hr = new Date().getHours(), mobDone = ST.mob.some(function (t) { return dkey(new Date(t)) === dkey(); });
+  if (!mobDone) below += '<button type="button" class="mini mrow" data-play="' + (hr < 17 && f.poste !== 'repos' ? 'pc' : 'daily') + '"><span><small>BIEN-ÊTRE</small><b>' + (hr < 17 && f.poste !== 'repos' ? 'Mobilité express 5 min' : 'Routine mobilité 17 min') + '</b></span><span class="d">▶</span></button>';
+  if (f.posteSet) below += '<div style="text-align:center"><button type="button" data-unposte="1" class="hlnk" style="padding:0;color:#6B7280">Poste : ' + POSTES[f.poste].n + ' · changer</button></div>';
+  h += '<div class="hsec hbelow">' + below + '</div>' + notifyCard() + bilanCard() + backupCard();
+  return h;
+}
+/* ---------- barre du bas façon iPhone : dock vitré, icônes « appli » ---------- */
+var NAVT = [['', 'home', 'ACCUEIL', '#FACC15'], ['seances', 'dumb', 'ENTRAÎNEMENT', '#FF7A1A'], ['repas', 'food', 'NUTRITION', '#4ADE80'], ['bienetre', 'moon', 'BIEN-ÊTRE', '#A5B4FC'], ['profil', 'user', 'PROFIL', '#F9A8D4']];
+function renderNav(r) { var t = tabOf(r), nav = document.getElementById('nav'); nav.className = 'nav dock';
+  nav.innerHTML = NAVT.map(function (x) { var on = t === x[0]; return '<button type="button" data-go="' + x[0] + '" class="' + (on ? 'on' : '') + '" aria-current="' + (on ? 'page' : 'false') + '" aria-label="' + x[2] + '"><span class="di" style="background:' + x[3] + '">' + ico(x[1], 24, 2.3) + '</span><span class="dl">' + x[2] + '</span></button>'; }).join(''); }
 
 route();
 inviteBoot();
