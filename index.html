@@ -355,7 +355,8 @@ function nSteps(p) {
   if (p.t === 'emom') return p.rmax - p.r + 1;
   return 1;
 }
-function weekNo() { if (!ST.start) return 1; return Math.floor((Date.now() - ST.start) / (7 * 864e5)) + 1; }
+function weekNo() { if (!ST.start) return 1; return Math.max(1, Math.floor((Date.now() - ST.start) / (7 * 864e5)) + 1); }
+function daysAgo(n) { var d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate() - n, 12); }
 function isDeload() { var w = weekNo(); return w % 8 === 0 || (ST.adapt && ST.adapt.deloadUntil > Date.now()); }
 function lightToday() { if (isDeload()) return ''; var c = (ST.checkin || {})[dkey()] || {}; if (ST.adapt && ST.adapt.light > 0) return 'fatigue'; if (c.energy === 'low' || c.sleep === 'bad') return 'forme'; return ''; }
 var MOVES = [['TRAC', /TRACTION/], ['POMPE', /POMPE|DÉVELOPPÉ/], ['DIPS', /DIPS/], ['ROW', /ROWING|TIRAGE HORIZONTAL/], ['JAMBE', /SQUAT|PRESSE|BULGARE/], ['ABDOS', /RELEVÉS|CRUNCH|L-SIT|HOLLOW/], ['GAIN', /GAINAGE|PLANCHE/]];
@@ -499,8 +500,8 @@ function finish(L) {
   entry.dur = nd; entry.fac = nf; entry.n = rated.length;
   if (rated.length >= 3 && nd / rated.length >= 0.5) {
     var prev = ST.log.filter(function (x) { return x.v === 5; }).pop();
-    if (prev && prev.n >= 3 && prev.dur / prev.n >= 0.5) { ST.adapt.deloadUntil = Date.now() + 7 * 864e5; ST.adapt.light = 0; adapt.push('2 séances dures d\'affilée : <b>semaine légère anticipée</b> (7 jours, 1 série de moins, niveaux gelés). Ton corps a besoin de récupérer pour progresser.'); }
-    else { ST.adapt.light = 2; adapt.push('Séance dure (' + nd + ' exercices sur ' + rated.length + ') : tes <b>2 prochaines séances sont allégées</b>, 1 série de moins partout.'); }
+    if (prev && prev.n >= 3 && prev.dur / prev.n >= 0.5 && Date.now() - prev.ts < 10 * 864e5 && !isDeload()) { ST.adapt.deloadUntil = Date.now() + 7 * 864e5; ST.adapt.light = 0; adapt.push('2 séances dures d\'affilée : <b>semaine légère anticipée</b> (7 jours, 1 série de moins, niveaux gelés). Ton corps a besoin de récupérer pour progresser.'); }
+    else if (!isDeload()) { ST.adapt.light = 2; ST.adapt.lightTs = Date.now(); adapt.push('Séance dure (' + nd + ' exercices sur ' + rated.length + ') : tes <b>2 prochaines séances sont allégées</b>, 1 série de moins partout.'); }
   } else if (rated.length >= 3 && nf / rated.length >= 0.5 && !nd) adapt.push('Séance facile (' + nf + ' sur ' + rated.length + ') : les niveaux montent, et les mêmes mouvements des autres séances aussi.');
   if (wasLight === 'forme') adapt.push('Séance allégée car tu étais fatigué ce matin : les niveaux restent valables.');
   if (FEEL) { var pf = ST.log.filter(function (x) { return x.v === 5; }).pop(); entry.feel = FEEL;
@@ -590,7 +591,7 @@ function spark(vals, color) {
   var pts = vals.map(function (v, i) { return (10 + i * (w - 20) / (vals.length - 1)).toFixed(1) + ',' + (h - 10 - (v - mn) / (mx - mn) * (h - 20)).toFixed(1); }).join(' ');
   return '<div class="chart"><svg viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Évolution"><polyline points="' + pts + '" fill="none" stroke="' + color + '" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></polyline>' + vals.map(function (v, i) { var p = pts.split(' ')[i].split(','); return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4" fill="#111"></circle>'; }).join('') + '</svg></div>';
 }
-function weeksStreak() { var n = 0, ws = weekStartTs(); for (var w = 0; w < 52; w++) { var a = ws - w * 7 * 864e5, b = a + 7 * 864e5; var c = ST.log.filter(function (x) { return x.ts >= a && x.ts < b; }).length; if (c >= 4) n++; else if (w > 0) break; } return n; }
+function weeksStreak() { var n = 0, ws = weekStartTs(); for (var w = 0; w < 52; w++) { var a = ws - w * 7 * 864e5, b = a + 7 * 864e5; var c = ST.log.filter(function (x) { return x.ts >= a && x.ts < b; }).length; if (c >= Math.min(4, prof().seances || 3)) n++; else if (w > 0) break; } return n; }
 function suivi() {
   var h = '<div class="hero"><div><small>MON SUIVI · SEMAINE ' + weekNo() + '</small><h1 class="d">JE PROGRESSE,<br><span>LA PREUVE</span></h1></div></div>';
   h += '<div class="sec"><div class="stat"><div><b>' + ST.log.length + '</b><small>séances au total</small></div><div><b>' + thisWeek().length + ' / ' + prof().seances + '</b><small>cette semaine</small></div><div><b>' + weeksStreak() + '</b><small>semaines à 4+ séances</small></div><div><b>' + last7(ST.mob) + ' · ' + last7(ST.soir) + '</b><small>mobilité · soir (7 j)</small></div></div>';
@@ -1083,7 +1084,7 @@ function weekCount() { return thisWeek().length; }
 function suggestSession() {
   var p = prof(), wk = weekCount(), N = p.seances, n = nextSession(), s = DATA[n];
   if (trainedToday()) { var t = ST.log.filter(function (x) { return dkey(new Date(x.ts)) === dkey(); }).pop(); return { done: true, txt: 'Séance ' + t.L + ' faite aujourd\'hui. Récupère bien.' }; }
-  var y1 = ST.log.some(function (x) { return dkey(new Date(x.ts)) === dkey(new Date(Date.now() - 864e5)); }), y2 = ST.log.some(function (x) { return dkey(new Date(x.ts)) === dkey(new Date(Date.now() - 2 * 864e5)); });
+  var y1 = ST.log.some(function (x) { return dkey(new Date(x.ts)) === dkey(daysAgo(1)); }), y2 = ST.log.some(function (x) { return dkey(new Date(x.ts)) === dkey(daysAgo(2)); });
   if (wk >= N) return { rest: true, txt: N + ' séances faites cette semaine : objectif atteint. Repos ou mobilité.' };
   if (y1 && y2) return { rest: true, txt: '2 jours d\'entraînement d\'affilée : aujourd\'hui, repos actif (mobilité + marche).' };
   var cp = customToday(); if (cp && DATA[cp]) return { L: cp, s: DATA[cp] };
@@ -1587,7 +1588,7 @@ document.addEventListener('click', function (ev) { var b = ev.target.closest && 
   if (b.dataset.bib) { var q2 = b.dataset.bib.split('|'); BIB[q2[0]] = q2[1]; var y = window.scrollY; route(); window.scrollTo(0, y); }
 });
 /* ---- version + mise à jour ---- */
-var APPVER = '2026.11.26-1716';
+var APPVER = '2026.11.26-1732';
 function updToast() { if (ST.appver && ST.appver !== APPVER) { var t = document.createElement('div'); t.textContent = '✓ Mise à jour installée'; t.style.cssText = 'position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);z-index:30;background:#22C55E;color:#111;border:3px solid #111;border-radius:99px;padding:10px 18px;font-weight:800;box-shadow:3px 3px 0 #111'; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3500); } if (ST.appver !== APPVER) { ST.appver = APPVER; save(); } }
 applySwaps();
 function swapsFresh() { if (JSON.stringify([ST.swap || {}, ST.aswap || {}, ST.prog || null]) !== SWSIG) applySwaps(); }
@@ -1831,7 +1832,7 @@ function pbOpt(attr, on, t, sub, tag) { return '<button type="button" ' + attr +
 function pbChips(list, sel, attr) { return '<div style="margin-top:10px">' + list.map(function (x) { var on = sel(x[0]); return '<button type="button" ' + attr + '="' + x[0] + '" style="border:2.5px solid #111;border-radius:99px;background:' + (on ? '#111' : '#fff') + ';color:' + (on ? '#fff' : '#111') + ';font:inherit;font-weight:800;font-size:14px;padding:8px 12px;min-height:46px;margin:0 6px 8px 0">' + (on ? '✓ ' : '') + x[1] + '</button>'; }).join('') + '</div>'; }
 function pbRow(attr, vals, cur, labels) { return '<div style="display:grid;grid-template-columns:repeat(' + vals.length + ',1fr);gap:8px;margin-top:8px">' + vals.map(function (v, i) { var on = cur === v; return '<button type="button" data-pb="' + attr + '|' + v + '" style="border:3px solid #111;border-radius:14px;background:' + (on ? '#111' : '#fff') + ';color:' + (on ? '#fff' : '#111') + ';font-family:Anton,Impact,sans-serif;font-size:19px;min-height:56px">' + labels[i] + '</button>'; }).join('') + '</div>'; }
 function forMethod(tag) { var m = PBT.method || 'mix'; return tag === 'all' || m === 'mix' || tag === m; }
-function pbMissing() { var st = pbSteps()[PB]; if (st === 'lieu' && !PBT.lieu) return 'Choisis où tu t\'entraînes.'; if (st === 'method' && !PBT.method) return 'Choisis ta façon de t\'entraîner.'; if (st === 'niveau' && PBT.method !== 'charges' && (PBT.mTrac < 0 || PBT.mPomp < 0)) return 'Choisis ton niveau aux tractions et aux pompes.'; return ''; }
+function pbMissing() { var st = pbSteps()[PB]; if (st === 'lieu' && !PBT.lieu) return 'Choisis où tu t\'entraînes.'; if (st === 'method' && !PBT.method) return 'Choisis ta façon de t\'entraîner.'; if (st === 'niveau' && ((PBT.mTrac < 0 || PBT.mPomp < 0) || (PBT.method !== 'pdc' && !PBT.expSet))) return 'Choisis ton niveau aux tractions et aux pompes.'; return ''; }
 function renderPB() {
   var g = PBT, st = pbSteps(), k = st[PB], h = '';
   if (k === 'lieu') h = pbHead('OÙ T\'ENTRAÎNES-TU ?', 'Le plus souvent.') + pbOpt('data-pb="lieu|home"', g.lieu === 'home', 'À LA MAISON', 'Dans ton salon, ton garage, ton jardin') + pbOpt('data-pb="lieu|gym"', g.lieu === 'gym', 'EN SALLE DE SPORT', 'Machines, barres, haltères à disposition') + pbOpt('data-pb="lieu|mix"', g.lieu === 'mix', 'LES DEUX', 'Je choisirai à chaque séance');
@@ -1839,7 +1840,7 @@ function renderPB() {
     h = pbHead('COMMENT VEUX-TU T\'ENTRAÎNER ?', 'Il n\'y a pas de mauvaise réponse : choisis ce qui te motive.') + ['pdc', 'charges', 'mix'].map(function (m) { return pbOpt('data-pb="method|' + m + '"', g.method === m, METHODS[m][0], METHODS[m][1], m === rec ? (g.lieu === 'gym' ? 'courant en salle' : g.lieu === 'home' ? 'le plus simple chez soi' : 'souple') : ''); }).join(''); }
   if (k === 'equip') h = pbHead('TON MATÉRIEL', 'Coche ce que tu as chez toi. Les exercices impossibles sont remplacés.') + pbChips(EQUIP.filter(function (x) { return forMethod(x[2]); }), function (q) { return !!g.equip[q]; }, 'data-pbeq') + '<div class="nx" style="margin-top:6px">' + (g.method === 'charges' ? 'Sans matériel coché, je te mets des exercices au poids du corps à la place.' : 'Conseil : une barre de traction de porte (20 à 30 €) change tout pour le dos.') + '</div>';
   if (k === 'niveau') { h = pbHead('TON NIVEAU AUJOURD\'HUI', 'Sois honnête : je te fais monter vite si c\'est trop facile.');
-    if (g.method !== 'charges') h += '<div class="side" style="margin-top:14px">TRACTIONS D\'AFFILÉE, BIEN FAITES</div>' + pbRow('mTrac', [0, 1, 2, 3], g.mTrac, ['0', '1–3', '4–8', '9+']) + '<div class="side" style="margin-top:14px">POMPES D\'AFFILÉE, BIEN FAITES</div>' + pbRow('mPomp', [0, 1, 2, 3], g.mPomp, ['0–5', '6–15', '16–30', '31+']);
+    h += '<div class="side" style="margin-top:14px">TRACTIONS D\'AFFILÉE, BIEN FAITES</div>' + pbRow('mTrac', [0, 1, 2, 3], g.mTrac, ['0', '1–3', '4–8', '9+']) + '<div class="side" style="margin-top:14px">POMPES D\'AFFILÉE, BIEN FAITES</div>' + pbRow('mPomp', [0, 1, 2, 3], g.mPomp, ['0–5', '6–15', '16–30', '31+']);
     if (g.method !== 'pdc') h += '<div class="side" style="margin-top:14px">LA MUSCU AVEC CHARGES, TU CONNAIS ?</div>' + pbRow('exp', ['debut', 'moins1', 'plus1'], g.exp, ['JAMAIS', '< 1 AN', '1 AN +']); }
   if (k === 'rythme') h = pbHead('TON RYTHME', 'Combien de séances par semaine, vraiment tenables ?') + pbRow('n', [2, 3, 4, 5], g.n, ['2', '3', '4', '5']) + '<div class="side" style="margin-top:18px">DURÉE D\'UNE SÉANCE</div>' + pbRow('dur', [30, 45, 60], g.dur, ['30 MIN', '45 MIN', '1 H']) + '<div class="nx" style="margin-top:10px">Mieux vaut 3 séances tenues toute l\'année que 5 abandonnées en un mois.</div>';
   if (k === 'prio') h = pbHead('TES PRIORITÉS', 'Choisis-en 1 ou 2, ou aucune : j\'ajoute du travail ciblé.') + pbChips(PRIOS.filter(function (x) { return g.method !== 'charges' || x[0] !== 'street'; }).map(function (x) { return [x[0], x[1]]; }), function (q) { return g.prio.indexOf(q) > -1; }, 'data-pbpr') + '<div class="nx">Exemple : « Tractions » ajoute des séries adaptées à ton niveau les jours où tu ne travailles pas le dos.</div>';
@@ -1852,7 +1853,7 @@ function renderPB() {
   pbEl.innerHTML = '<div style="display:flex;flex-direction:column;min-height:100%;gap:4px">' + h + '</div>';
   if (last) previewPB();
 }
-function pbCommit(g) { var p = prof(); ['mTrac', 'mPomp', 'exp'].forEach(function (q) { if (g[q] !== undefined) p[q] = g[q]; }); var o = JSON.parse(JSON.stringify(g)); delete o.mTrac; delete o.mPomp; delete o.exp; delete o.splitTouched; o.done = true; return o; }
+function pbCommit(g) { var p = prof(); ['mTrac', 'mPomp', 'exp'].forEach(function (q) { if (g[q] !== undefined) p[q] = g[q]; }); var o = JSON.parse(JSON.stringify(g)); delete o.mTrac; delete o.mPomp; delete o.exp; delete o.expSet; delete o.splitTouched; o.done = true; return o; }
 function modeFor(g) { return g.method === 'charges' ? 'gym' : g.method === 'pdc' ? 'home' : (g.lieu === 'gym' ? 'gym' : 'home'); }
 function previewPB() { var old = JSON.stringify(ST.prog || null), oldMode = ST.mode, p = prof(), oldLv = [p.mTrac, p.mPomp, p.exp]; var el = pbEl.querySelector('#pbprev');
   try { ST.prog = pbCommit(PBT); ST.mode = modeFor(PBT); applyProgram(true);
@@ -1866,7 +1867,7 @@ function pbClick(ev) { var b = ev.target.closest('button'); if (!b) return; var 
   if (b.dataset.pbpr) { var k = b.dataset.pbpr, i = g.prio.indexOf(k); if (i > -1) g.prio.splice(i, 1); else { g.prio.push(k); if (g.prio.length > 2) g.prio.shift(); } renderPB(); return; }
   if (b.dataset.pbav) { var a = b.dataset.pbav, j = g.avoid.indexOf(a); if (j > -1) g.avoid.splice(j, 1); else g.avoid.push(a); renderPB(); return; }
   var q = (b.dataset.pb || '').split('|');
-  if (q[0] === 'lieu' || q[0] === 'method' || q[0] === 'exp') { g[q[0]] = q[1]; if (q[0] === 'method' && q[1] === 'charges') { g.prio = g.prio.filter(function (x) { return x !== 'street'; }); } renderPB(); return; }
+  if (q[0] === 'lieu' || q[0] === 'method' || q[0] === 'exp') { g[q[0]] = q[1]; if (q[0] === 'exp') g.expSet = 1; if (q[0] === 'method' && q[1] === 'charges') { g.prio = g.prio.filter(function (x) { return x !== 'street'; }); } renderPB(); return; }
   if (q[0] === 'split') { g.split = q[1]; g.splitTouched = true; renderPB(); return; }
   if (q[0] === 'n' || q[0] === 'dur' || q[0] === 'mTrac' || q[0] === 'mPomp') { g[q[0]] = +q[1]; if (q[0] === 'n') g.splitTouched = false; renderPB(); return; }
   if (q[0] === 'close') { pbEl.classList.remove('on'); document.body.style.overflow = ''; route(); return; }
@@ -1969,7 +1970,7 @@ document.addEventListener('click', function (ev) { var b = ev.target.closest && 
 
 /* ================= RAPPEL DE SAUVEGARDE ================= */
 function backupCard() { var last = ST.lastBackup || 0, start = ST.start || Date.now(); if (Date.now() - last < 30 * 864e5 || Date.now() - start < 7 * 864e5) return '';
-  return '<div class="sec"><div class="card" style="margin:0;background:#FEF9C3"><div class="h3">SAUVEGARDE TA PROGRESSION</div><p style="margin:6px 0 0">Tout est dans ce téléphone. Une fois par mois, copie ta sauvegarde chiffrée dans tes notes : si tu perds ton téléphone, tu ne perds rien.</p><button type="button" data-bk="1" style="width:100%;margin-top:10px;border:3px solid #111;border-radius:14px;background:#111;color:#fff;font-weight:800;padding:12px;min-height:52px">Copier ma sauvegarde</button></div></div>'; }
+  return '<div class="sec"><div class="card" style="margin:0;background:#FEF9C3"><div class="h3">SAUVEGARDE TA PROGRESSION</div><p style="margin:6px 0 0">Tout est dans ce téléphone. Une fois par mois, copie ta sauvegarde chiffrée dans tes notes : si tu perds ton téléphone, tu ne perds rien.</p><button type="button" data-bk="1" style="width:100%;margin-top:10px;border:3px solid #111;border-radius:14px;background:#111;color:#fff;font-weight:800;padding:12px;min-height:52px">Copier ma sauvegarde</button><button type="button" data-bklater="1" style="display:block;margin:6px auto 0;border:0;background:none;font-weight:800;text-decoration:underline;min-height:44px">Plus tard (dans un mois)</button></div></div>'; }
 document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('button[data-bk]'); if (!b) return; exportBackup().then(function (t) { return navigator.clipboard.writeText(t); }).then(function () { ST.lastBackup = Date.now(); save(); toast('✓ Copiée : colle-la dans tes notes'); route(); }, function () { toast('Copie refusée par le téléphone', '#FCA5A5'); }); });
 /* marquer la sauvegarde aussi depuis le profil */
 document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('button[data-sec="exp"]'); if (b) { ST.lastBackup = Date.now(); save(); } }, true);
@@ -2371,6 +2372,18 @@ var finishOrig = finish; finish = function (L) { var last = ST.log[ST.log.length
 document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('button[data-manual]'); if (!b) return; var L = b.dataset.manual;
   if (!b.dataset.sure) { b.dataset.sure = '1'; b.innerHTML = 'Touche encore pour confirmer : séance ' + L + ' faite aujourd\'hui'; b.style.background = '#DCFCE7'; return; }
   ST.log.push({ v: 5, L: L, m: getMode(), d: today(), ts: Date.now(), ex: [], manual: 1, n: 0, dur: 0, fac: 0 }); save(); toast('✓ Séance ' + L + ' enregistrée. Prochaine : ' + nextSession()); go(''); });
+
+/* semaines légères : la semaine automatique (toutes les 8) saute si une semaine légère a eu lieu dans les 3 dernières semaines ; un allègement expire après 10 jours */
+function isDeload() { var A = ST.adapt || {}; if (A.deloadUntil > Date.now()) return true; var w = weekNo(); if (w % 8 !== 0) return false; return !(A.lastDeload && Date.now() - A.lastDeload < 21 * 864e5); }
+function lightToday() { if (isDeload()) return ''; var A = ST.adapt || {}, c = (ST.checkin || {})[dkey()] || {}; if (A.light > 0 && A.lightTs && Date.now() - A.lightTs > 10 * 864e5) A.light = 0; if (A.light > 0) return 'fatigue'; if (c.energy === 'low' || c.sleep === 'bad') return 'forme'; return ''; }
+(function () { var f0 = finish; finish = function (L) { if (!ST.adapt || typeof ST.adapt !== 'object') ST.adapt = {}; var du0 = ST.adapt.deloadUntil || 0, li0 = ST.adapt.light || 0; var r = f0(L);
+  if ((ST.adapt.deloadUntil || 0) > du0) ST.adapt.lastDeload = Date.now(); if ((ST.adapt.light || 0) > 0 && (ST.adapt.light || 0) >= li0 && !ST.adapt.lightTs) ST.adapt.lightTs = Date.now(); if ((ST.adapt.light || 0) > li0) ST.adapt.lightTs = Date.now(); save(); return r; }; })();
+/* reconstruction du programme : niveaux et charges suivent l'exercice, pas sa place dans la séance */
+function levelSnapshot() { var snap = {}; Object.keys(DATA).forEach(function (L) { var S = DATA[L]; if (!S || S.custom || !S.ex) return; S.ex.forEach(function (z, i) { ['home', 'gym'].forEach(function (m) { var e = z[m]; if (!e) return; var o = ST.lvl[key(L, i, m)]; if (!o) return; var id = m + '|' + e.name, cur = snap[id]; if (!cur || (o.hist || []).length > (cur.hist || []).length) snap[id] = JSON.parse(JSON.stringify(o)); }); }); }); return snap; }
+function levelRestore(snap) { ORDER.forEach(function (L) { var S = DATA[L]; if (!S || S.custom || !S.ex) return; S.ex.forEach(function (z, i) { ['home', 'gym'].forEach(function (m) { var e = z[m]; if (!e) return; var k = key(L, i, m), s = snap[m + '|' + e.name]; if (s) ST.lvl[k] = JSON.parse(JSON.stringify(s)); else delete ST.lvl[k]; }); }); }); }
+(function () { var ap = applyProgram; applyProgram = function (preview) { if (preview) return ap(true); var snap = levelSnapshot(); var r = ap(false); levelRestore(snap); return r; }; })();
+/* sauvegarde : on peut reporter le rappel d'un mois */
+document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('button[data-bklater]'); if (!b) return; ST.lastBackup = Date.now() - 0; ST.bkSnooze = 1; save(); route(); });
 
 /* ================= PDF MAISON : vrai fichier PDF, sans window.print (qui ne marche pas dans l'appli iPhone) ================= */
 var WINMAP = { '€': 128, '‚': 130, '„': 132, '…': 133, '‘': 145, '’': 146, '“': 147, '”': 148, '•': 149, '–': 150, '—': 151, 'œ': 156, 'Œ': 140, 'Ÿ': 159 };
