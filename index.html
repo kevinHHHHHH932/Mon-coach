@@ -1399,6 +1399,7 @@ function profil() {
   function fld(k, lab, unit, step) { return '<label>' + lab + '<input type="number" inputmode="decimal" step="' + (step || 1) + '" data-pf="' + k + '" value="' + esc(p[k]) + '"><small style="font-weight:600">' + (unit || '') + '</small></label>'; }
   function seg(k, vals, labs) { return '<div class="mode" style="grid-template-columns:repeat(' + vals.length + ',1fr);margin-top:8px">' + vals.map(function (v, i) { return '<button type="button" data-pset="' + k + '|' + v + '" class="' + (String(p[k]) === String(v) ? 'on' : '') + '" style="font-size:15px">' + labs[i] + '</button>'; }).join('') + '</div>'; }
   h += '<div class="sec"><div class="t d">MOI</div><div class="card" style="margin:0"><div class="form"><label>Mon nom dans l\'appli<input type="text" data-pf="prenom" value="' + esc(p.prenom) + '"></label>' + fld('age', 'Âge', 'ans') + fld('taille', 'Taille', 'cm') + fld('poids', 'Poids de départ', 'kg', 0.1) + '</div>' + seg('sexe', ['h', 'f'], ['HOMME', 'FEMME']) + '</div></div>';
+  h += '<div class="sec" style="padding-top:0"><button type="button" class="btn" data-sec="lock" style="width:100%;min-height:52px;border:3px solid #B91C1C;color:#B91C1C;font-weight:800">⏻ Se déconnecter</button></div>';
   h += '<div class="sec" style="padding-top:0"><button type="button" data-pval="1" style="width:100%;border:3px solid #111;border-radius:16px;background:#22C55E;font-family:Anton,Impact,sans-serif;font-size:22px;padding:12px;min-height:58px;box-shadow:4px 4px 0 #111">✓ VALIDER MES INFOS</button><div id="pvalbox"></div></div>';
   h += '<div class="sec"><div class="t d">MON OBJECTIF</div>' + '<div class="mode" style="grid-template-columns:repeat(3,1fr);margin-top:8px">' + [['seche', 'PERDRE DU GRAS'], ['forme', 'FORME'], ['muscle', 'MUSCLE']].map(function (o) { return '<button type="button" data-pobj="' + o[0] + '" class="' + (p.objs.indexOf(o[0]) > -1 ? 'on' : '') + '" style="font-size:14px">' + o[1] + '</button>'; }).join('') + '</div>' + '<div class="card" style="margin:10px 0 0"><div class="form">' + fld('cTrac', 'Tractions visées', 'd\'affilée') + fld('cPomp', 'Pompes visées', 'd\'affilée') + fld('cCrunch', 'Crunchs visés', 'd\'affilée') + fld('cTour', 'Tour de taille visé', 'cm', 0.5) + '</div></div></div>';
   h += '<div class="sec"><div class="t d">MON ENTRAÎNEMENT</div>' + seg('lieu', ['home', 'gym'], ['MAISON', 'SALLE']) + seg('seances', [2, 3, 4, 5], ['2', '3', '4', '5']) + '<div class="note" style="margin:6px 0 0">Séances par semaine</div>' + seg('travail', ['classique', 'postes'], ['HORAIRES CLASSIQUES', 'HORAIRES DÉCALÉS']) + seg('compl', ['true', 'false'], ['COMPLÉMENTS : OUI', 'NON']) + '</div>';
@@ -1508,7 +1509,7 @@ document.addEventListener('click', function (ev) { var b = ev.target.closest && 
   if (b.dataset.bib) { var q2 = b.dataset.bib.split('|'); BIB[q2[0]] = q2[1]; var y = window.scrollY; route(); window.scrollTo(0, y); }
 });
 /* ---- version + mise à jour ---- */
-var APPVER = '2026.11.26-1256';
+var APPVER = '2026.11.26-1305';
 function updToast() { if (ST.appver && ST.appver !== APPVER) { var t = document.createElement('div'); t.textContent = '✓ Mise à jour installée'; t.style.cssText = 'position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);z-index:30;background:#22C55E;color:#111;border:3px solid #111;border-radius:99px;padding:10px 18px;font-weight:800;box-shadow:3px 3px 0 #111'; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3500); } if (ST.appver !== APPVER) { ST.appver = APPVER; save(); } }
 applySwaps();
 function swapsFresh() { if (JSON.stringify([ST.swap || {}, ST.aswap || {}, ST.prog || null]) !== SWSIG) applySwaps(); }
@@ -1527,8 +1528,16 @@ function decObj(box, key) { return crypto.subtle.decrypt({ name: 'AES-GCM', iv: 
 var SAVING = false, SAVE_AGAIN = false;
 function save() { ST.updated = Date.now(); if (!CK || !VAULT) return; if (SAVING) { SAVE_AGAIN = true; return; } SAVING = true;
   encObj(ST, CK).then(function (box) { VAULT.iv = box.iv; VAULT.ct = box.ct; try { localStorage.setItem(VKEY, JSON.stringify(VAULT)); } catch (e) {} }).catch(function () {}).then(function () { SAVING = false; if (SAVE_AGAIN) { SAVE_AGAIN = false; save(); } }); }
-function remember(on) { if (on && CK) crypto.subtle.exportKey('raw', CK).then(function (raw) { try { localStorage.setItem(RKEY, b64(raw)); } catch (e) {} }); else try { localStorage.removeItem(RKEY); } catch (e) {} }
-function rememberedKey() { var r = null; try { r = localStorage.getItem(RKEY); } catch (e) {} if (!r) return Promise.resolve(null); return crypto.subtle.importKey('raw', unb64(r), { name: 'AES-GCM' }, true, ['encrypt', 'decrypt']); }
+/* « Toujours connecté » : la clé reste dans ce téléphone (localStorage + IndexedDB en secours) jusqu'à « Se déconnecter ». */
+function kdb(fn) { try { var r = indexedDB.open('moncoach-cle', 1); r.onupgradeneeded = function () { r.result.createObjectStore('k'); }; r.onsuccess = function () { try { fn(r.result); } catch (e) { fn(null); } }; r.onerror = function () { fn(null); }; } catch (e) { fn(null); } }
+function remember(on) {
+  if (on && CK) { crypto.subtle.exportKey('raw', CK).then(function (raw) { var t = b64(raw); try { localStorage.setItem(RKEY, t); } catch (e) {} kdb(function (db) { if (!db) return; try { var tx = db.transaction('k', 'readwrite'); tx.objectStore('k').put(t, 'cle'); } catch (e) {} }); }).catch(function () {});
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {} }
+  else { try { localStorage.removeItem(RKEY); } catch (e) {} kdb(function (db) { if (!db) return; try { db.transaction('k', 'readwrite').objectStore('k').delete('cle'); } catch (e) {} }); } }
+function rememberedRaw() { return new Promise(function (res) { var r = null; try { r = localStorage.getItem(RKEY); } catch (e) {} if (r) { res(r); return; }
+  var done = false; setTimeout(function () { if (!done) { done = true; res(null); } }, 1500);
+  kdb(function (db) { if (!db) { if (!done) { done = true; res(null); } return; } try { var q = db.transaction('k', 'readonly').objectStore('k').get('cle'); q.onsuccess = function () { if (!done) { done = true; res(q.result || null); } }; q.onerror = function () { if (!done) { done = true; res(null); } }; } catch (e) { if (!done) { done = true; res(null); } } }); }); }
+function rememberedKey() { return rememberedRaw().then(function (r) { if (!r) return null; try { localStorage.setItem(RKEY, r); } catch (e) {} return crypto.subtle.importKey('raw', unb64(r), { name: 'AES-GCM' }, true, ['encrypt', 'decrypt']); }); }
 var lkEl = null, LK = { err: '', busy: false, wipe: 0 };
 function lockScreen() { if (!lkEl) { lkEl = document.createElement('div'); lkEl.className = 'player'; lkEl.style.overflowY = 'auto'; lkEl.style.zIndex = 40; lkEl.setAttribute('role', 'dialog'); lkEl.setAttribute('aria-label', 'Connexion'); document.body.appendChild(lkEl); lkEl.addEventListener('click', lkClick); lkEl.addEventListener('keydown', function (e) { if (e.key === 'Enter') { var b = lkEl.querySelector('[data-lk="go"]'); if (b) b.click(); } }); } lkEl.classList.add('on'); document.body.style.overflow = 'hidden'; renderLock(); }
 function lkIn(id, lab, type, ph, ac, val) { return '<label style="display:flex;flex-direction:column;font-weight:800;gap:4px;margin-top:12px">' + lab + '<input id="' + id + '" type="' + type + '" placeholder="' + ph + '" autocomplete="' + ac + '" autocapitalize="none" value="' + esc(val || '') + '" style="min-height:56px;border:3px solid #111;border-radius:12px;font:inherit;font-size:20px;font-weight:700;padding:6px 12px"></label>'; }
@@ -1536,7 +1545,8 @@ function renderLock() {
   var nw = !VAULT, h = '<div style="display:flex;flex-direction:column;min-height:100%;gap:6px"><div style="text-align:center;margin-top:10px"><div class="d" style="font-size:24px;color:#FF7A1A;letter-spacing:6px">MON</div><div class="d" style="font-size:60px;line-height:1">COACH</div><div style="width:150px;height:10px;background:#FACC15;border-radius:4px;margin:10px auto 0"></div></div>';
   if (nw) h += '<div class="nm d" style="font-size:26px;margin-top:16px">CHOISIS TON MOT DE PASSE</div>' + lkIn('lk-ps', 'Ton pseudo', 'text', 'ex : julie69', 'username', (access() || {}).ps) + lkIn('lk-pw', 'Mot de passe (8 caractères minimum)', 'password', '••••••••', 'new-password') + lkIn('lk-pw2', 'Confirme le mot de passe', 'password', '••••••••', 'new-password');
   else h += '<div class="nm d" style="font-size:26px;margin-top:16px">BON RETOUR ' + esc(String(VAULT.pseudo || '').toUpperCase()) + '</div>' + lkIn('lk-pw', 'Ton mot de passe', 'password', '••••••••', 'current-password');
-  h += '<button type="button" data-lk="rem" style="display:flex;gap:10px;align-items:center;margin-top:14px;border:0;background:none;font:inherit;font-weight:800;text-align:left;min-height:44px"><span class="d" style="font-size:26px">' + (LK.rem !== false ? '☑' : '☐') + '</span>Rester connecté sur ce téléphone</button>';
+  if (LK.out) h += '<div class="banner" style="margin:12px 0 0;background:#DCFCE7">Tu es déconnecté. Tes données restent chiffrées dans ce téléphone.</div>';
+  if (false) h += '<button type="button" data-lk="rem" style="display:flex;gap:10px;align-items:center;margin-top:14px;border:0;background:none;font:inherit;font-weight:800;text-align:left;min-height:44px"><span class="d" style="font-size:26px">' + (LK.rem !== false ? '☑' : '☐') + '</span>Rester connecté sur ce téléphone</button>';
   if (LK.err) h += '<div class="banner" style="margin:8px 0 0;background:#FEE2E2">' + esc(LK.err) + '</div>';
   h += '<button type="button" data-lk="go" ' + (LK.busy ? 'disabled ' : '') + 'style="width:100%;margin-top:14px;border:3px solid #111;border-radius:16px;background:#111;color:#fff;font-family:Anton,Impact,sans-serif;font-size:24px;padding:16px;min-height:64px;box-shadow:4px 4px 0 #FF7A1A">' + (LK.busy ? 'UN INSTANT…' : nw ? 'CRÉER MON ACCÈS' : 'OUVRIR') + '</button>';
   h += '<div class="note" style="margin:12px 0 0;text-align:center">🔒 Tes données sont chiffrées avec ton mot de passe et restent dans ce téléphone. Rien n\'est envoyé sur Internet.' + (nw ? ' Note bien ton mot de passe : personne ne peut le récupérer, pas même le créateur de l\'appli.' : '') + '</div>';
@@ -1544,7 +1554,7 @@ function renderLock() {
   lkEl.innerHTML = h + '</div>';
 }
 function lkVal(id) { var e = lkEl.querySelector('#' + id); return e ? e.value : ''; }
-function unlocked(fresh) { lkEl && lkEl.classList.remove('on'); document.body.style.overflow = ''; LK.busy = false; applySwaps(); route(); if (!prof().done) startWizard(); updToast(); }
+function unlocked(fresh) { LK.out = 0; lkEl && lkEl.classList.remove('on'); document.body.style.overflow = ''; LK.busy = false; applySwaps(); route(); if (!prof().done) startWizard(); updToast(); }
 function lkClick(ev) {
   var b = ev.target.closest('button'); if (!b || !b.dataset.lk) return; var q = b.dataset.lk;
   if (q === 'rem') { LK.rem = LK.rem === false; var keep = [lkVal('lk-ps'), lkVal('lk-pw'), lkVal('lk-pw2')]; renderLock(); ['lk-ps', 'lk-pw', 'lk-pw2'].forEach(function (id, i) { var e = lkEl.querySelector('#' + id); if (e) e.value = keep[i]; }); return; }
@@ -1559,12 +1569,12 @@ function lkClick(ev) {
     if (pw !== lkVal('lk-pw2')) { LK.err = 'Les deux mots de passe ne sont pas identiques.'; renderLock(); return; }
     LK.busy = true; LK.err = ''; renderLock();
     var salt = crypto.getRandomValues(new Uint8Array(16));
-    deriveKey(pw, salt).then(function (k) { CK = k; VAULT = { v: 1, pseudo: ps, salt: b64(salt) }; ST.pseudo = ps; prof().prenom = nom; save(); remember(LK.rem !== false); unlocked(true); }).catch(function () { LK.busy = false; LK.err = 'Ce téléphone ne permet pas le chiffrement. Mets à jour iOS ou Android.'; renderLock(); });
+    deriveKey(pw, salt).then(function (k) { CK = k; VAULT = { v: 1, pseudo: ps, salt: b64(salt) }; ST.pseudo = ps; prof().prenom = nom; save(); remember(true); unlocked(true); }).catch(function () { LK.busy = false; LK.err = 'Ce téléphone ne permet pas le chiffrement. Mets à jour iOS ou Android.'; renderLock(); });
     return;
   }
   if (!pw) { LK.err = 'Écris ton mot de passe.'; renderLock(); return; }
   LK.busy = true; LK.err = ''; renderLock();
-  deriveKey(pw, unb64(VAULT.salt)).then(function (k) { return decObj(VAULT, k).then(function (obj) { CK = k; ST = normalize(obj); remember(LK.rem !== false); unlocked(false); }); })
+  deriveKey(pw, unb64(VAULT.salt)).then(function (k) { return decObj(VAULT, k).then(function (obj) { CK = k; ST = normalize(obj); remember(true); unlocked(false); }); })
     .catch(function () { LK.busy = false; LK.err = 'Mot de passe incorrect.'; renderLock(); });
 }
 function bootLock() {
@@ -1572,15 +1582,15 @@ function bootLock() {
   if (!VAULT) { lockScreen(); return; }
   rememberedKey().then(function (k) { if (!k) { lockScreen(); return; } return decObj(VAULT, k).then(function (obj) { CK = k; ST = normalize(obj); unlocked(false); }); }).catch(function () { lockScreen(); });
 }
-function lockNow() { remember(false); CK = null; ST = normalize({}); LK = { err: '', busy: false, wipe: 0, rem: false }; location.hash = ''; lockScreen(); }
+function lockNow() { remember(false); CK = null; ST = normalize({}); LK = { err: '', busy: false, wipe: 0, out: 1 }; location.hash = ''; lockScreen(); }
 /* ---- sauvegarde chiffrée (changement de téléphone) ---- */
 function exportBackup() { return encObj(ST, CK).then(function (box) { return 'MONCOACH1.' + btoa(JSON.stringify({ s: VAULT.salt, iv: box.iv, ct: box.ct, p: VAULT.pseudo })); }); }
 function importBackup(txt, pw) { var o = JSON.parse(atob(String(txt).trim().replace(/^MONCOACH1\./, ''))); return deriveKey(pw, unb64(o.s)).then(function (k) { return decObj({ iv: o.iv, ct: o.ct }, k); }); }
 function wipeAll() { try { indexedDB.deleteDatabase('moncoach-photos'); } catch (e) {} try { localStorage.removeItem(VKEY); localStorage.removeItem(RKEY); localStorage.removeItem(LKEY); } catch (e) {} if (window.caches) caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }); location.hash = ''; location.reload(); }
 function secBlock() {
-  return '<div class="sec"><div class="t d">SÉCURITÉ ET CONFIDENTIALITÉ</div><div class="card" style="margin:0"><p>🔒 Identifiant <b>' + esc((VAULT && VAULT.pseudo) || '') + '</b>. Tes données sont <b>chiffrées</b> avec ton mot de passe et ne quittent <b>jamais</b> ce téléphone.</p>'
+  return '<div class="sec"><div class="t d">SÉCURITÉ ET CONFIDENTIALITÉ</div><div class="card" style="margin:0"><p>🔒 Identifiant <b>' + esc((VAULT && VAULT.pseudo) || '') + '</b>. Tes données sont <b>chiffrées</b> avec ton mot de passe et ne quittent <b>jamais</b> ce téléphone. Tu restes connecté jusqu\'à « Se déconnecter ».</p>'
     + '<div class="list" style="margin-top:8px">'
-    + '<button type="button" class="btn" data-sec="lock" style="width:100%">Verrouiller maintenant</button>'
+    + '<button type="button" class="btn" data-sec="lock" style="width:100%">Se déconnecter</button>'
     + '<button type="button" class="btn" data-sec="pw" style="width:100%">Changer mon mot de passe</button>'
     + '<button type="button" class="btn" data-sec="exp" style="width:100%">Copier ma sauvegarde chiffrée</button>'
     + '<button type="button" class="btn" data-sec="imp" style="width:100%">Restaurer une sauvegarde</button>'
@@ -1591,12 +1601,12 @@ function secBlock() {
 document.addEventListener('click', function (ev) {
   var b = ev.target.closest && ev.target.closest('button[data-sec]'); if (!b) return; var q = b.dataset.sec, box = document.getElementById('secbox'), msg = document.getElementById('secmsg');
   function field(id, ph, type) { return '<input id="' + id + '" type="' + (type || 'password') + '" placeholder="' + ph + '" autocapitalize="none" style="width:100%;margin-top:8px;min-height:50px;border:2px solid #111;border-radius:10px;font:inherit;padding:6px 10px">'; }
-  if (q === 'lock') { lockNow(); return; }
+  if (q === 'lock') { if (!b.dataset.sure) { b.dataset.sure = '1'; b.dataset.old = b.innerHTML; b.innerHTML = 'Sûr ? Touche encore pour te déconnecter'; b.style.background = '#FEE2E2'; setTimeout(function () { if (b.dataset.sure) { delete b.dataset.sure; b.innerHTML = b.dataset.old; b.style.background = ''; } }, 4000); return; } lockNow(); return; }
   if (q === 'wipe') { if (b.dataset.c !== '1') { b.dataset.c = '1'; b.textContent = 'Touche encore : tout effacer définitivement'; return; } wipeAll(); return; }
   if (q === 'exp') { exportBackup().then(function (t) { return navigator.clipboard.writeText(t); }).then(function () { msg.textContent = 'Sauvegarde chiffrée copiée. Colle-la dans tes notes : elle ne s\'ouvre qu\'avec ton mot de passe.'; }, function () { msg.textContent = 'Copie refusée par le téléphone.'; }); return; }
   if (q === 'pw') { box.innerHTML = field('sp-old', 'Mot de passe actuel') + field('sp-new', 'Nouveau mot de passe (8 caractères min.)') + '<button type="button" class="btn dark" data-sec="pwgo" style="width:100%;margin-top:8px">Valider</button>'; return; }
   if (q === 'pwgo') { var o = document.getElementById('sp-old').value, n = document.getElementById('sp-new').value; if (n.length < 8) { msg.textContent = 'Le nouveau mot de passe doit faire au moins 8 caractères.'; return; }
-    deriveKey(o, unb64(VAULT.salt)).then(function (k) { return decObj(VAULT, k); }).then(function () { var salt = crypto.getRandomValues(new Uint8Array(16)); return deriveKey(n, salt).then(function (k) { CK = k; VAULT.salt = b64(salt); save(); var r = null; try { r = localStorage.getItem(RKEY); } catch (e) {} if (r) remember(true); box.innerHTML = ''; msg.textContent = 'Mot de passe changé ✓'; }); }, function () { msg.textContent = 'Mot de passe actuel incorrect.'; }); return; }
+    deriveKey(o, unb64(VAULT.salt)).then(function (k) { return decObj(VAULT, k); }).then(function () { var salt = crypto.getRandomValues(new Uint8Array(16)); return deriveKey(n, salt).then(function (k) { CK = k; VAULT.salt = b64(salt); save(); remember(true); box.innerHTML = ''; msg.textContent = 'Mot de passe changé ✓'; }); }, function () { msg.textContent = 'Mot de passe actuel incorrect.'; }); return; }
   if (q === 'imp') { box.innerHTML = '<textarea id="sp-bk" rows="3" placeholder="Colle ta sauvegarde (MONCOACH1…)" style="width:100%;margin-top:8px;border:2px solid #111;border-radius:10px;font:inherit;padding:6px 10px"></textarea>' + field('sp-bpw', 'Mot de passe de cette sauvegarde') + '<button type="button" class="btn dark" data-sec="impgo" style="width:100%;margin-top:8px">Restaurer</button>'; return; }
   if (q === 'impgo') { importBackup(document.getElementById('sp-bk').value, document.getElementById('sp-bpw').value).then(function (obj) { ST = normalize(obj); ST.photos = []; ST.updated = Date.now(); save(); applySwaps(); msg.textContent = 'Sauvegarde restaurée ✓'; box.innerHTML = ''; setTimeout(function () { go(''); }, 600); }, function () { msg.textContent = 'Sauvegarde ou mot de passe incorrect.'; }); return; }
 });
