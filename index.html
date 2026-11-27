@@ -264,6 +264,26 @@ body[data-tab="profil"] { --tint: #FCE7F3; --acc: #BE185D; }
 .top[style*="#111111"] .k { color: #111 !important; opacity: .65; }
 .top[style*="#111111"] .L { color: var(--acc) !important; }
 .sec .t.d { letter-spacing: .01em; }
+/* ===== accueil v2 ===== */
+.hhero { align-items: center; padding-bottom: 18px; }
+.hsub { font-weight: 700; font-size: 14px; margin-top: 4px; opacity: .8; }
+.hring { position: relative; flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.hupd2 { border: 0; background: none; font-size: 15px; font-weight: 800; color: #111; opacity: .6; min-height: 30px; min-width: 44px; }
+.tlist { display: flex; flex-direction: column; gap: 10px; }
+.trow { display: flex; align-items: center; gap: 12px; background: #fff; border: 2.5px solid #111; border-radius: 18px; box-shadow: 3px 3px 0 #111; padding: 10px 12px; min-height: 66px; cursor: pointer; }
+.trow.tdone { background: #F0FDF4; }
+.ti { position: relative; width: 44px; height: 44px; flex: 0 0 44px; border-radius: 13px; border: 2px solid #111; display: flex; align-items: center; justify-content: center; color: #111; }
+.ti i { position: absolute; right: -6px; bottom: -6px; width: 20px; height: 20px; border-radius: 50%; background: #22C55E; border: 2px solid #111; display: flex; align-items: center; justify-content: center; color: #111; }
+.tt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.tt b { font-size: 16px; line-height: 1.15; } .tt small { font-size: 13px; color: #4B5563; font-weight: 600; line-height: 1.25; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt em { display: block; height: 6px; border-radius: 9px; background: #E5E7EB; margin-top: 6px; overflow: hidden; } .tt em u { display: block; height: 100%; background: #22C55E; border-radius: 9px; }
+.tr { flex: 0 0 auto; display: flex; gap: 6px; align-items: center; }
+.tgo { width: 44px; height: 44px; border-radius: 50%; background: #111; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; } .tgo.ghost { background: #F3F4F6; color: #111; border: 2px solid #111; }
+.tpm { width: 44px; height: 44px; border-radius: 50%; border: 2.5px solid #111; background: #fff; font-size: 22px; font-weight: 800; line-height: 1; color: #111; } .tpm.dark { background: #111; color: #fff; } .tpm:disabled { opacity: .3; }
+.tnum { font-family: Anton, Impact, sans-serif; font-size: 20px; }
+.tchips { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 4px 2px; } .tchips button { border: 2px solid #111; border-radius: 99px; background: #fff; font: inherit; font-weight: 800; font-size: 13px; min-height: 44px; padding: 4px 12px; color: #111; } .tchips .tset { border-style: dashed; }
+.tskip { border: 0; background: none; font-weight: 800; text-decoration: underline; min-height: 44px; color: #6B7280; }
+.tipc { background: #FFFBEB; border: 2px dashed #F59E0B; border-radius: 18px; padding: 12px 14px; } .tipc .d { font-size: 13px; letter-spacing: .08em; color: #B45309; } .tipc p { margin: 4px 0 0; font-weight: 600; line-height: 1.4; }
 .wsolo button { aspect-ratio: auto !important; min-height: 96px; }
 .swthumb svg { width: 100% !important; height: auto !important; display: block; }
 #printzone { display: none; }
@@ -1588,7 +1608,7 @@ document.addEventListener('click', function (ev) { var b = ev.target.closest && 
   if (b.dataset.bib) { var q2 = b.dataset.bib.split('|'); BIB[q2[0]] = q2[1]; var y = window.scrollY; route(); window.scrollTo(0, y); }
 });
 /* ---- version + mise à jour ---- */
-var APPVER = '2026.11.26-1732';
+var APPVER = '2026.11.27-0929';
 function updToast() { if (ST.appver && ST.appver !== APPVER) { var t = document.createElement('div'); t.textContent = '✓ Mise à jour installée'; t.style.cssText = 'position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);z-index:30;background:#22C55E;color:#111;border:3px solid #111;border-radius:99px;padding:10px 18px;font-weight:800;box-shadow:3px 3px 0 #111'; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3500); } if (ST.appver !== APPVER) { ST.appver = APPVER; save(); } }
 applySwaps();
 function swapsFresh() { if (JSON.stringify([ST.swap || {}, ST.aswap || {}, ST.prog || null]) !== SWSIG) applySwaps(); }
@@ -1826,13 +1846,13 @@ var prescOrig = presc; presc = function (p, k) { var r = prescOrig(p, k); try { 
 var pbEl = null, PB = 0, PBT = null, PBTT = 0;
 function pbSteps() { var g = PBT, s = ['lieu', 'method']; if (g.lieu && g.lieu !== 'gym') s.push('equip'); s.push('niveau', 'rythme', 'prio', 'avoid', 'split', 'apercu'); return s; }
 function startBuilder() { if (!pbEl) { pbEl = document.createElement('div'); pbEl.className = 'player'; pbEl.style.overflowY = 'auto'; pbEl.style.zIndex = 35; pbEl.setAttribute('role', 'dialog'); pbEl.setAttribute('aria-label', 'Construire mon programme'); document.body.appendChild(pbEl); pbEl.addEventListener('click', pbClick); }
-  PBT = JSON.parse(JSON.stringify(prog())); var p = prof(); PBT.n = PBT.n || p.seances || 3; PBT.mTrac = p.mTrac; PBT.mPomp = p.mPomp; PBT.exp = p.exp; PBT.splitTouched = false; PB = 0; pbEl.classList.add('on'); document.body.style.overflow = 'hidden'; renderPB(); }
+  PBT = JSON.parse(JSON.stringify(prog())); var p = prof(); PBT.n = PBT.n || p.seances || 3; PBT.mTrac = p.mTrac; PBT.mPomp = p.mPomp; PBT.exp = p.exp; PBT.mSquat = p.mSquat; PBT.mGain = p.mGain; PBT.mCurl = p.mCurl; PBT.splitTouched = false; PB = 0; pbEl.classList.add('on'); document.body.style.overflow = 'hidden'; renderPB(); }
 function pbHead(t, sub) { var st = pbSteps(), n = PB + 1, N = PBT.lieu === 'gym' ? 8 : 9; return '<div class="bar"><div style="width:' + (n / N * 100) + '%;background:#22C55E"></div></div><div class="side" style="margin-top:10px">TON COACH · ' + n + ' / ' + N + '</div><div class="nm d" style="font-size:30px;margin-top:10px">' + t + '</div>' + (sub ? '<p style="text-align:center;font-weight:600;margin:4px 0 0">' + sub + '</p>' : ''); }
 function pbOpt(attr, on, t, sub, tag) { return '<button type="button" ' + attr + ' style="width:100%;margin-top:12px;border:3px solid #111;border-radius:16px;background:' + (on ? '#111' : '#fff') + ';color:' + (on ? '#fff' : '#111') + ';padding:12px 14px;min-height:60px;text-align:left;box-shadow:3px 3px 0 #111;position:relative"><span class="d" style="font-size:20px;display:block">' + (on ? '✓ ' : '') + t + '</span>' + (sub ? '<small style="font-weight:700">' + sub + '</small>' : '') + (tag ? '<span style="position:absolute;top:-11px;right:10px;background:#FACC15;color:#111;border:2px solid #111;border-radius:99px;font-size:11px;font-weight:800;padding:1px 8px">' + tag + '</span>' : '') + '</button>'; }
 function pbChips(list, sel, attr) { return '<div style="margin-top:10px">' + list.map(function (x) { var on = sel(x[0]); return '<button type="button" ' + attr + '="' + x[0] + '" style="border:2.5px solid #111;border-radius:99px;background:' + (on ? '#111' : '#fff') + ';color:' + (on ? '#fff' : '#111') + ';font:inherit;font-weight:800;font-size:14px;padding:8px 12px;min-height:46px;margin:0 6px 8px 0">' + (on ? '✓ ' : '') + x[1] + '</button>'; }).join('') + '</div>'; }
-function pbRow(attr, vals, cur, labels) { return '<div style="display:grid;grid-template-columns:repeat(' + vals.length + ',1fr);gap:8px;margin-top:8px">' + vals.map(function (v, i) { var on = cur === v; return '<button type="button" data-pb="' + attr + '|' + v + '" style="border:3px solid #111;border-radius:14px;background:' + (on ? '#111' : '#fff') + ';color:' + (on ? '#fff' : '#111') + ';font-family:Anton,Impact,sans-serif;font-size:19px;min-height:56px">' + labels[i] + '</button>'; }).join('') + '</div>'; }
+function pbRow(attr, vals, cur, labels) { return '<div style="display:grid;grid-template-columns:repeat(' + vals.length + ',1fr);gap:8px;margin-top:8px">' + vals.map(function (v, i) { var on = cur === v; return '<button type="button" data-pb="' + attr + '|' + v + '" style="border:3px solid #111;border-radius:14px;background:' + (on ? '#111' : '#fff') + ';color:' + (on ? '#fff' : '#111') + ';font-family:Anton,Impact,sans-serif;font-size:' + (String(labels[i]).length > 6 ? '14px' : '19px') + ';line-height:1.05;padding:2px;min-height:56px">' + labels[i] + '</button>'; }).join('') + '</div>'; }
 function forMethod(tag) { var m = PBT.method || 'mix'; return tag === 'all' || m === 'mix' || tag === m; }
-function pbMissing() { var st = pbSteps()[PB]; if (st === 'lieu' && !PBT.lieu) return 'Choisis où tu t\'entraînes.'; if (st === 'method' && !PBT.method) return 'Choisis ta façon de t\'entraîner.'; if (st === 'niveau' && ((PBT.mTrac < 0 || PBT.mPomp < 0) || (PBT.method !== 'pdc' && !PBT.expSet))) return 'Choisis ton niveau aux tractions et aux pompes.'; return ''; }
+function pbMissing() { var st = pbSteps()[PB]; if (st === 'lieu' && !PBT.lieu) return 'Choisis où tu t\'entraînes.'; if (st === 'method' && !PBT.method) return 'Choisis ta façon de t\'entraîner.'; if (st === 'niveau' && levelMissing(PBT)) return 'Choisis ton niveau aux tractions et aux pompes.'; return ''; }
 function renderPB() {
   var g = PBT, st = pbSteps(), k = st[PB], h = '';
   if (k === 'lieu') h = pbHead('OÙ T\'ENTRAÎNES-TU ?', 'Le plus souvent.') + pbOpt('data-pb="lieu|home"', g.lieu === 'home', 'À LA MAISON', 'Dans ton salon, ton garage, ton jardin') + pbOpt('data-pb="lieu|gym"', g.lieu === 'gym', 'EN SALLE DE SPORT', 'Machines, barres, haltères à disposition') + pbOpt('data-pb="lieu|mix"', g.lieu === 'mix', 'LES DEUX', 'Je choisirai à chaque séance');
@@ -1840,10 +1860,9 @@ function renderPB() {
     h = pbHead('COMMENT VEUX-TU T\'ENTRAÎNER ?', 'Il n\'y a pas de mauvaise réponse : choisis ce qui te motive.') + ['pdc', 'charges', 'mix'].map(function (m) { return pbOpt('data-pb="method|' + m + '"', g.method === m, METHODS[m][0], METHODS[m][1], m === rec ? (g.lieu === 'gym' ? 'courant en salle' : g.lieu === 'home' ? 'le plus simple chez soi' : 'souple') : ''); }).join(''); }
   if (k === 'equip') h = pbHead('TON MATÉRIEL', 'Coche ce que tu as chez toi. Les exercices impossibles sont remplacés.') + pbChips(EQUIP.filter(function (x) { return forMethod(x[2]); }), function (q) { return !!g.equip[q]; }, 'data-pbeq') + '<div class="nx" style="margin-top:6px">' + (g.method === 'charges' ? 'Sans matériel coché, je te mets des exercices au poids du corps à la place.' : 'Conseil : une barre de traction de porte (20 à 30 €) change tout pour le dos.') + '</div>';
   if (k === 'niveau') { h = pbHead('TON NIVEAU AUJOURD\'HUI', 'Sois honnête : je te fais monter vite si c\'est trop facile.');
-    h += '<div class="side" style="margin-top:14px">TRACTIONS D\'AFFILÉE, BIEN FAITES</div>' + pbRow('mTrac', [0, 1, 2, 3], g.mTrac, ['0', '1–3', '4–8', '9+']) + '<div class="side" style="margin-top:14px">POMPES D\'AFFILÉE, BIEN FAITES</div>' + pbRow('mPomp', [0, 1, 2, 3], g.mPomp, ['0–5', '6–15', '16–30', '31+']);
-    if (g.method !== 'pdc') h += '<div class="side" style="margin-top:14px">LA MUSCU AVEC CHARGES, TU CONNAIS ?</div>' + pbRow('exp', ['debut', 'moins1', 'plus1'], g.exp, ['JAMAIS', '< 1 AN', '1 AN +']); }
+    h += levelQuestions(g); }
   if (k === 'rythme') h = pbHead('TON RYTHME', 'Combien de séances par semaine, vraiment tenables ?') + pbRow('n', [2, 3, 4, 5], g.n, ['2', '3', '4', '5']) + '<div class="side" style="margin-top:18px">DURÉE D\'UNE SÉANCE</div>' + pbRow('dur', [30, 45, 60], g.dur, ['30 MIN', '45 MIN', '1 H']) + '<div class="nx" style="margin-top:10px">Mieux vaut 3 séances tenues toute l\'année que 5 abandonnées en un mois.</div>';
-  if (k === 'prio') h = pbHead('TES PRIORITÉS', 'Choisis-en 1 ou 2, ou aucune : j\'ajoute du travail ciblé.') + pbChips(PRIOS.filter(function (x) { return g.method !== 'charges' || x[0] !== 'street'; }).map(function (x) { return [x[0], x[1]]; }), function (q) { return g.prio.indexOf(q) > -1; }, 'data-pbpr') + '<div class="nx">Exemple : « Tractions » ajoute des séries adaptées à ton niveau les jours où tu ne travailles pas le dos.</div>';
+  if (k === 'prio') h = pbHead('TES PRIORITÉS', 'Choisis-en 1 ou 2, ou aucune : j\'ajoute du travail ciblé.') + pbChips(priosFor(g).map(function (x) { return [x[0], x[1]]; }), function (q) { return g.prio.indexOf(q) > -1; }, 'data-pbpr') + '<div class="nx">Exemple : « Tractions » ajoute des séries adaptées à ton niveau les jours où tu ne travailles pas le dos.</div>';
   if (k === 'avoid') h = pbHead('TU N\'ES PAS À L\'AISE AVEC…', 'Je les remplace par des équivalents. Rien n\'est obligatoire.') + pbChips(DISLIKE_EX.filter(function (x) { return forMethod(x[2]); }).map(function (x) { return [x[0], x[0]]; }), function (q) { return g.avoid.indexOf(q) > -1; }, 'data-pbav') + '<div class="nx">Tes douleurs déclarées sont déjà prises en compte.</div>';
   if (k === 'split') { var adv = splitAdvice(g.n, g); if (!g.splitTouched || splitsFor(g.n, g).indexOf(g.split) < 0) g.split = adv[0];
     h = pbHead('L\'ORGANISATION', 'Pour ' + g.n + ' séance' + (g.n > 1 ? 's' : '') + ' par semaine :') + '<div class="card" style="margin:12px 0 0;background:#FEF9C3"><b>MON CONSEIL</b> · ' + esc(adv[1]) + '</div>' + splitsFor(g.n, g).map(function (s) { return pbOpt('data-pb="split|' + s + '"', g.split === s, SPLITS[s][0], SPLITS[s][1], s === adv[0] ? 'conseillé pour toi' : ''); }).join(''); }
@@ -1853,7 +1872,7 @@ function renderPB() {
   pbEl.innerHTML = '<div style="display:flex;flex-direction:column;min-height:100%;gap:4px">' + h + '</div>';
   if (last) previewPB();
 }
-function pbCommit(g) { var p = prof(); ['mTrac', 'mPomp', 'exp'].forEach(function (q) { if (g[q] !== undefined) p[q] = g[q]; }); var o = JSON.parse(JSON.stringify(g)); delete o.mTrac; delete o.mPomp; delete o.exp; delete o.expSet; delete o.splitTouched; o.done = true; return o; }
+function pbCommit(g) { var p = prof(); ['mTrac', 'mPomp', 'exp', 'mSquat', 'mGain', 'mCurl'].forEach(function (q) { if (g[q] !== undefined && g[q] !== null) p[q] = g[q]; }); var o = JSON.parse(JSON.stringify(g)); delete o.mTrac; delete o.mPomp; delete o.exp; delete o.mSquat; delete o.mGain; delete o.mCurl; delete o.expSet; delete o.splitTouched; o.done = true; return o; }
 function modeFor(g) { return g.method === 'charges' ? 'gym' : g.method === 'pdc' ? 'home' : (g.lieu === 'gym' ? 'gym' : 'home'); }
 function previewPB() { var old = JSON.stringify(ST.prog || null), oldMode = ST.mode, p = prof(), oldLv = [p.mTrac, p.mPomp, p.exp]; var el = pbEl.querySelector('#pbprev');
   try { ST.prog = pbCommit(PBT); ST.mode = modeFor(PBT); applyProgram(true);
@@ -1869,7 +1888,7 @@ function pbClick(ev) { var b = ev.target.closest('button'); if (!b) return; var 
   var q = (b.dataset.pb || '').split('|');
   if (q[0] === 'lieu' || q[0] === 'method' || q[0] === 'exp') { g[q[0]] = q[1]; if (q[0] === 'exp') g.expSet = 1; if (q[0] === 'method' && q[1] === 'charges') { g.prio = g.prio.filter(function (x) { return x !== 'street'; }); } renderPB(); return; }
   if (q[0] === 'split') { g.split = q[1]; g.splitTouched = true; renderPB(); return; }
-  if (q[0] === 'n' || q[0] === 'dur' || q[0] === 'mTrac' || q[0] === 'mPomp') { g[q[0]] = +q[1]; if (q[0] === 'n') g.splitTouched = false; renderPB(); return; }
+  if (q[0] === 'n' || q[0] === 'dur' || q[0] === 'mTrac' || q[0] === 'mPomp' || q[0] === 'mSquat' || q[0] === 'mGain' || q[0] === 'mCurl') { g[q[0]] = +q[1]; if (q[0] === 'n') g.splitTouched = false; renderPB(); return; }
   if (q[0] === 'close') { pbEl.classList.remove('on'); document.body.style.overflow = ''; route(); return; }
   if (q[0] === 'back') { PB = Math.max(0, PB - 1); renderPB(); pbEl.scrollTop = 0; return; }
   if ((q[0] === 'next' || q[0] === 'back') && Date.now() - (PBTT || 0) < 400) return; if (q[0] === 'next' || q[0] === 'back') PBTT = Date.now();
@@ -1917,6 +1936,7 @@ var STD_ORIG = null;
 function stdOrder() { return progOrder(); }
 function stdPick(id, m) { var p = prof(), x = LIBI[id]; if (!x) return id; var g = x.grp, tr = Math.max(0, p.mTrac), po = Math.max(0, p.mPomp), base = p.exp === 'debut' ? 1 : p.exp === 'plus1' ? 3 : 2;
   var tl = (g === 'dosv' || g === 'biceps') ? [1, 1, 2, 3][tr] : (g === 'pecs' || g === 'triceps' || g === 'epaules') ? [1, 2, 2, 3][po] : (g === 'dosh') ? [1, 1, 2, 3][Math.max(tr, po > 1 ? 1 : 0)] : Math.min(base, 2 + (po >= 3 ? 1 : 0)), wh = m === 'home' ? 'h' : 'g';
+  if (p.sexe === 'f' && (g === 'pecs' || g === 'triceps' || g === 'epaules')) tl = [1, 1, 2, 3][po]; if ((g === 'quads' || g === 'post' || g === 'mollets') && p.mSquat >= 0) tl = [1, 1, 2, 3][p.mSquat]; if ((g === 'gainage' || g === 'abdos') && p.mGain >= 0) tl = [1, 1, 2, 3][p.mGain];
   if (m === 'gym' && g !== 'dosv') tl = Math.max(1, base);
   if (whOK(x, m) && x.lvl <= tl && !avoidFor(id).length && equipOK(x.gear, m, x.name) && !avoidedByUser(x.name)) return id;
   var c = LIB.filter(function (y) { return y.grp === x.grp && whOK(y, m) && y.lvl <= tl && !avoidFor(y.id).length && equipOK(y.gear, m, y.name) && !avoidedByUser(y.name); }).sort(function (a, b) { return b.lvl - a.lvl; });
@@ -1925,7 +1945,7 @@ function stdPick(id, m) { var p = prof(), x = LIBI[id]; if (!x) return id; var g
   return z || id; }
 function buildStd() {
   ORDER = stdOrder();
-  Object.keys(STD).forEach(function (k) { var S = STD[k], used = { home: {}, gym: {} };
+  Object.keys(STD).forEach(function (k) { var S = (prof().sexe === 'f' && typeof STDF === 'object' && STDF[k]) ? STDF[k] : STD[k], used = { home: {}, gym: {} };
     var ex = S.home.map(function (hid, i) { var o = {}; ['home', 'gym'].forEach(function (m) { var id = stdPick(S[m][i] || hid, m); if (used[m][id]) { var gx = LIBI[id].grp, alt = null; [gx].concat(CHAIN[gx] || []).forEach(function (gg) { if (alt) return; alt = LIB.filter(function (y) { return y.grp === gg && whOK(y, m) && !used[m][y.id] && !avoidFor(y.id).length && y.lvl <= Math.max(LIBI[id].lvl, 1) + 1 && equipOK(y.gear, m, y.name) && !avoidedByUser(y.name); }).sort(function (a, b) { return Math.abs(a.lvl - LIBI[id].lvl) - Math.abs(b.lvl - LIBI[id].lvl); })[0] || null; }); if (alt) id = alt.id; } used[m][id] = 1; o[m] = libEx(LIBI[id]); }); return o; });
     var d = { circuit: false, std: true, word: S.word, memo: S.memo, theme: S.theme, time: S.time, day: '', warm: '5 min : cercles d\'épaules et de hanches, 15 squats lents, 10 pompes faciles (genoux si besoin), 20 s de suspension ou de gainage', color: S.color, foot: 'Repos 60 à 90 s. Garde 1 à 2 répétitions en réserve : propre avant lourd.', ex: ex };
     DATA[k] = d; BASE[k] = JSON.parse(JSON.stringify(d)); });
@@ -2508,6 +2528,112 @@ document.addEventListener('click', function (ev) { var b = ev.target.closest && 
     var box = document.getElementById('mesmsg'); if (bad) { box.innerHTML = '<div class="banner" style="background:#FEE2E2;margin:10px 0 0">Vérifie ' + esc(bad) + '</div>'; return; } if (!n) { box.innerHTML = '<div class="banner" style="background:#FEF9C3;margin:10px 0 0">Remplis au moins une mesure.</div>'; return; }
     var same = ST.body.filter(function (x) { return dkey(new Date(x.ts)) === dkey(); })[0]; if (same) Object.keys(e).forEach(function (k) { if (k !== 'ts' && k !== 'd') same[k] = e[k]; }); else ST.body.push(e); ST.body.sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); });
     SUIVI.form = false; if (e.poids) SUIVI.metric = 'poids'; save(); toast('✓ Mesures enregistrées'); route(); window.scrollTo(0, 0); return; } });
+
+/* ================= PROFIL FEMME : exercices, questions de niveau et programmes adaptés ================= */
+/* Repères : priorité au bas du corps et aux fessiers (2 à 3 fois par semaine), haut du corps « tonique » (dos, épaules, bras) sans le délaisser, gainage. */
+(function () { function add(o, base) { if (LIBI[o.id] || !base) return; var x = JSON.parse(JSON.stringify(base)); Object.keys(o).forEach(function (k) { x[k] = o[k]; }); LIB.push(x); LIBI[x.id] = x; }
+  var R = function (s, r, rmax) { return { t: 'reps', s: s, r: r, rmax: rmax, smax: 4 }; };
+  add({ id: 'sqs', name: 'SQUAT SUMO', grp: 'quads', lvl: 1, where: 'hg', gear: 'Aucun (haltère en salle)', muscles: 'Fessiers, adducteurs, cuisses', memo: 'Pieds larges, pointes vers l\'extérieur', tip: 'Descends en poussant les genoux vers l\'extérieur, dos droit. En salle, tiens un haltère entre les jambes.', err: 'Genoux qui rentrent vers l\'intérieur.', rest: '60 s', sec: 60, p: R(3, 12, 20) }, LIBI.sq);
+  add({ id: 'frv', name: 'FENTES ARRIÈRE', grp: 'quads', lvl: 1, where: 'hg', gear: 'Aucun (haltères en salle)', muscles: 'Fessiers, cuisses', memo: 'Grand pas en arrière, buste légèrement penché', tip: 'Plus douces pour les genoux que les fentes avant. Pousse dans le talon avant pour remonter.', err: 'Genou avant qui rentre vers l\'intérieur.', rest: '60 s', sec: 60, p: R(3, 10, 15) }, LIBI.fa || LIBI.sq);
+  add({ id: 'fl', name: 'FENTES LATÉRALES', grp: 'quads', lvl: 1, where: 'hg', gear: 'Aucun', muscles: 'Fessiers, adducteurs', memo: 'Grand pas de côté, fesses en arrière', tip: 'Jambe tendue de l\'autre côté, poids dans le talon.', err: 'Dos rond.', rest: '60 s', sec: 60, p: R(3, 10, 15) }, LIBI.fa || LIBI.sq);
+  add({ id: 'dk', name: 'DONKEY KICKS', grp: 'post', lvl: 1, where: 'hg', gear: 'Tapis', muscles: 'Grand fessier', memo: 'À quatre pattes, talon vers le plafond', tip: 'Genou plié à 90°, serre la fesse en haut 1 seconde. Ventre rentré, sans cambrer.', err: 'Cambrer le bas du dos.', rest: '45 s', sec: 45, p: R(3, 15, 25) }, LIBI.pf);
+  add({ id: 'abl', name: 'ABDUCTION COUCHÉE', grp: 'post', lvl: 1, where: 'hg', gear: 'Tapis (mini-élastique en option)', muscles: 'Moyen fessier', memo: 'Sur le côté, monte la jambe tendue', tip: 'Pointe de pied légèrement vers le bas, monte lentement. Le moyen fessier galbe le haut des hanches.', err: 'Basculer le bassin vers l\'arrière.', rest: '45 s', sec: 45, p: R(3, 15, 25) }, LIBI.pf);
+  add({ id: 'abm', name: 'ABDUCTION MACHINE', grp: 'post', lvl: 1, where: 'g', gear: 'Machine', muscles: 'Moyen fessier', memo: 'Buste penché en avant, écarte lentement', tip: 'Garde 1 seconde ouvert. Penché en avant, tu vises davantage les fessiers.', err: 'Lâcher la charge au retour.', rest: '60 s', sec: 60, p: { t: 'load', s: 3, r: 12, rmax: 15, inc: 2.5 } }, LIBI.lc || LIBI.pf);
+  add({ id: 'kbp', name: 'KICKBACK À LA POULIE', grp: 'post', lvl: 1, where: 'g', gear: 'Poulie basse + sangle de cheville', muscles: 'Grand fessier', memo: 'Jambe vers l\'arrière, bassin fixe', tip: 'Mains sur la machine, buste légèrement penché, serre la fesse en fin de mouvement.', err: 'Cambrer pour monter plus haut.', rest: '45 s', sec: 45, p: { t: 'load', s: 3, r: 12, rmax: 15, inc: 2.5 } }, LIBI.lc || LIBI.pf);
+})();
+var STDF = {
+ F: { word: 'CORPS ENTIER 1', memo: 'Tout le corps, fessiers en tête', theme: 'FESSIERS · JAMBES · DOS · BRAS', color: '#FF7A1A', time: '≈ 45 MIN', home: ['sqs', 'pf', 'pi', 'rt', 'abl', 'pl'], gym: ['ht', 'pr', 'tv', 'dh', 'abm', 'pl'] },
+ T: { word: 'CORPS ENTIER 2', memo: 'Mêmes muscles, autres angles', theme: 'FESSIERS · CUISSES · ÉPAULES · GAINAGE', color: '#22C55E', time: '≈ 45 MIN', home: ['frv', 'pf1', 'rsv', 'el', 'dk', 'gl'], gym: ['srh', 'fb', 'th', 'dmh', 'kbp', 'gl'] },
+ H: { word: 'HAUT DU CORPS · TONUS', memo: 'Dos, épaules, bras, posture', theme: 'DOS · ÉPAULES · BRAS · GAINAGE', color: '#3B82F6', time: '≈ 45 MIN', home: ['rt', 'pi', 'el', 'tel', 'ct', 'dbc', 'pl'], gym: ['tv', 'dh', 'th', 'dmh', 'el', 'ch', 'ep'] },
+ J: { word: 'BAS DU CORPS · FESSIERS', memo: 'Fessiers, cuisses, galbe', theme: 'FESSIERS · CUISSES · HANCHES', color: '#EC4899', time: '≈ 45 MIN', home: ['sqs', 'pf', 'frv', 'pf1', 'abl', 'dk'], gym: ['ht', 'pr', 'srh', 'fb', 'abm', 'kbp'] }
+};
+function isF(g) { return prof().sexe === 'f'; }
+/* questions de niveau : adaptées au profil, simples à estimer */
+function levelQuestions(g) { var f = isF(), h = '';
+  h += '<div class="side" style="margin-top:14px">SQUATS D\'AFFILÉE, CUISSES PARALLÈLES AU SOL</div>' + pbRow('mSquat', [0, 1, 2, 3], g.mSquat, ['0–10', '11–20', '21–35', '36+']);
+  h += '<div class="side" style="margin-top:14px">' + (f ? 'POMPES, BIEN FAITES' : 'POMPES D\'AFFILÉE, BIEN FAITES') + '</div>' + pbRow('mPomp', [0, 1, 2, 3], g.mPomp, f ? ['AUCUNE', '1–10 GENOUX', '10+ GENOUX', 'CLASSIQUES'] : ['0–5', '6–15', '16–30', '31+']);
+  h += '<div class="side" style="margin-top:14px">GAINAGE PLANCHE, TENU SANS CREUSER LE DOS</div>' + pbRow('mGain', [0, 1, 2, 3], g.mGain, ['< 20 S', '20–45 S', '45–90 S', '90 S +']);
+  h += '<div class="side" style="margin-top:14px">' + (f ? 'À UNE BARRE DE TRACTION, TU PEUX…' : 'TRACTIONS D\'AFFILÉE, BIEN FAITES') + '</div>' + pbRow('mTrac', [0, 1, 2, 3], g.mTrac, f ? ['RIEN ENCORE', 'TENIR 10 S', '1–3 TRACT.', '4+ TRACT.'] : ['0', '1–3', '4–8', '9+']);
+  if (g.method !== 'pdc') { h += '<div class="side" style="margin-top:14px">LA MUSCU AVEC CHARGES, TU CONNAIS ?</div>' + pbRow('exp', ['debut', 'moins1', 'plus1'], g.exp, ['JAMAIS', '< 1 AN', '1 AN +']);
+    h += '<div class="side" style="margin-top:14px">CURL BICEPS : HALTÈRE POUR 10 RÉPÉTITIONS PROPRES</div>' + pbRow('mCurl', [0, 1, 2, 3], g.mCurl, f ? ['2–4 KG', '5–7 KG', '8–10 KG', '10 KG +'] : ['≤ 6 KG', '7–10 KG', '11–15 KG', '16 KG +']); }
+  return h + '<div class="nx" style="margin-top:8px">Pas sûr·e ? Choisis le plus bas : je te fais monter vite si c\'est facile.</div>'; }
+function levelMissing(g) { function no(v) { return v === undefined || v === null || v < 0; } return no(g.mSquat) || no(g.mPomp) || no(g.mGain) || no(g.mTrac) || (g.method !== 'pdc' && (!g.expSet || no(g.mCurl))); }
+/* niveau global pour le conseil d'organisation */
+function lvlOf(g) { var p = prof(), sq = p.mSquat >= 0 ? p.mSquat : -1, gn = p.mGain >= 0 ? p.mGain : -1, parts = [p.mPomp, p.mTrac, sq, gn].filter(function (v) { return v >= 0; });
+  var avg = parts.length ? parts.reduce(function (a, b) { return a + b; }, 0) / parts.length : 0, pd = avg >= 2.5 ? 3 : avg >= 1.5 ? 2 : 1;
+  if (isF() && sq >= 0) pd = Math.round((sq + Math.max(0, p.mPomp) + Math.max(0, gn)) / 3) >= 2 ? (sq >= 3 ? 3 : 2) : 1;
+  var ch = p.exp === 'plus1' ? 3 : p.exp === 'moins1' ? 2 : 1; if (p.mCurl >= 0) ch = Math.round((ch + [1, 2, 2, 3][p.mCurl]) / 2);
+  return g.method === 'charges' ? ch : g.method === 'pdc' ? pd : Math.round((pd + ch) / 2); }
+/* priorités : ordre et choix adaptés */
+PRIOS.push(['fessiers', 'FESSIERS', 'Galber et renforcer les fessiers']);
+PRIO_EX.fessiers = ['pf', 'dk', 'abl'];
+function priosFor(g) { var f = isF(), L = PRIOS.filter(function (x) { return !(x[0] === 'street' && (g.method === 'charges' || f)); });
+  if (f) { var ord = ['fessiers', 'jambes', 'abdos', 'posture', 'bras', 'cardio', 'pompes', 'tractions']; L.sort(function (a, b) { return ord.indexOf(a[0]) - ord.indexOf(b[0]); }); L = L.map(function (x) { return x[0] === 'bras' ? ['bras', 'BRAS TONIQUES', x[2]] : x[0] === 'abdos' ? ['abdos', 'TAILLE ET ABDOS', x[2]] : x[0] === 'jambes' ? ['jambes', 'CUISSES', x[2]] : x; }); }
+  return L; }
+(function () { var pp = prioPair; prioPair = function (k, m) { if (k !== 'fessiers') return pp(k, m);
+  var pick = function (ids) { for (var i = 0; i < ids.length; i++) { var y = LIBI[ids[i]]; if (y && whOK(y, m) && equipOK(y.gear, m, y.name) && !avoidFor(y.id).length && !avoidedByUser(y.name)) return y; } return null; };
+  return [pick(m === 'gym' ? ['ht', 'kbp', 'pf'] : ['pf', 'pf1', 'dk']), pick(m === 'gym' ? ['abm', 'abl'] : ['abl', 'dk'])].filter(Boolean); }; })();
+/* les fessiers se travaillent aussi les jours « haut du corps », pas le jour jambes */
+(function () { var ape = applyProgExtras; applyProgExtras = function () { var g = prog(), hasF = g.prio.indexOf('fessiers') > -1; if (!hasF) return ape();
+  var save0 = g.prio.slice(); g.prio = g.prio.filter(function (k) { return k !== 'fessiers'; }); ape(); g.prio = save0;
+  var used = 0; ORDER.forEach(function (L) { var S = DATA[L]; if (!S || S.custom || used >= 2) return; if (L === 'J' || L === 'C') return;
+    var hp = prioPair('fessiers', 'home'), gp = prioPair('fessiers', 'gym'), n = Math.min(hp.length, gp.length), added = 0;
+    for (var q = 0; q < n; q++) { var hx = hp[q], gx = gp[q]; if (S.ex.some(function (z) { return z.home.name === hx.name || z.gym.name === gx.name; })) continue; var o = { home: libEx(hx), gym: libEx(gx) }; o.home.prio = 'fessiers'; o.gym.prio = 'fessiers'; S.ex.push(o); added++; }
+    if (added) used++; }); sessionTimes(); }; })();
+/* organisation : pour une femme, pas le programme « poids du corps » A-E par défaut, jambes en premier */
+(function () { var sf = splitsFor, sa = splitAdvice, po = progOrder;
+  splitsFor = function (n, g) { if (!isF()) return sf(n, g); return n <= 2 ? ['full'] : n === 3 ? ['full', 'hb'] : ['hb', 'full']; };
+  splitAdvice = function (n, g) { if (!isF()) return sa(n, g); g = g || prog(); var lv = lvlOf(g);
+    if (n <= 3) return ['full', 'Le corps entier ' + n + ' fois par semaine, fessiers et jambes en tête de séance : chaque muscle travaille 2 à 3 fois, c\'est ce qui fait le plus progresser.'];
+    return ['hb', 'Haut / bas en alternance, en commençant par une séance fessiers-jambes : le bas du corps travaille 2 fois par semaine' + (lv === 1 ? ', avec de la récupération entre.' : ', le haut du corps reste tonique.')]; };
+  progOrder = function () { var o = po(); if (isF() && o.length === 2 && o[0] === 'H') return ['J', 'H']; return o; }; })();
+/* objectifs : libellés plus parlants pour une femme */
+(function () { var rw = renderWz; renderWz = function () { var keep = JSON.parse(JSON.stringify(OBJ)); if (isF()) { OBJ.muscle = ['TONIFIER ET GALBER', 'Fessiers, jambes, silhouette plus ferme', OBJ.muscle[2]]; OBJ.seche = ['PERDRE DU GRAS', 'Affiner la taille, perdre du ventre', OBJ.seche[2]]; } try { rw(); } finally { Object.keys(keep).forEach(function (k) { OBJ[k] = keep[k]; }); } }; })();
+
+/* ================= ACCUEIL v2 : anneau de la journée + liste « Aujourd'hui » façon iPhone ================= */
+var HOME = { cx: false };
+ICO.ruler = '<path d="M4 15l11-11 5 5-11 11z"/><path d="M8 11l2 2M11 8l2 2M14 5l2 2"/>';
+ICO.chat = '<path d="M5 5h14v10H9l-4 4z"/>';
+function ring(done, tot) { var r = 26, c = 2 * Math.PI * r, p = tot ? done / tot : 0; return '<svg viewBox="0 0 64 64" width="72" height="72" aria-label="' + done + ' sur ' + tot + '"><circle cx="32" cy="32" r="' + r + '" fill="#fff" stroke="rgba(0,0,0,.1)" stroke-width="8"/><circle cx="32" cy="32" r="' + r + '" fill="none" stroke="' + (done >= tot ? '#22C55E' : '#FF7A1A') + '" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + (c * p).toFixed(1) + ' ' + c.toFixed(1) + '" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="17" fill="#111">' + done + '/' + tot + '</text></svg>'; }
+function trow(o) { return '<div class="trow' + (o.done ? ' tdone' : '') + '"' + (o.attr ? ' ' + o.attr + ' role="button" tabindex="0"' : '') + '><span class="ti" style="background:' + o.col + '">' + ico(o.icon, 22, 2.3) + (o.done ? '<i>' + ico('check', 12, 3.5) + '</i>' : '') + '</span><span class="tt"><b>' + o.t + '</b><small>' + o.s + '</small>' + (o.bar != null ? '<em><u style="width:' + Math.min(100, o.bar) + '%"></u></em>' : '') + '</span><span class="tr">' + (o.right || '') + '</span></div>' + (o.extra || ''); }
+function jour() {
+  var p = prof(), f = food(), T = targets(f), E = eaten(f), ck = checkin(), c = prisCfg(), M = macroTargets(T), h = '';
+  var ss = suggestSession(); if (!ss.done && !ss.rest && ck.c && ck.c.sleep === 'bad' && ck.c.energy === 'low') ss = { rest: true, txt: 'Nuit courte et batterie à plat : mobilité aujourd\'hui, la séance ' + ss.L + ' demain.' };
+  var items = []; if (c.multi) items.push(['multi', 'Vitamines', !!f.compl.multi, 'data-compl="multi"']); if (c.crea) items.push(['crea', 'Créatine', !!f.compl.crea, 'data-compl="crea"']);
+  if (c.shaker) items.push(['shaker', 'Shaker ' + c.shg + ' g', (f.log || []).some(function (e) { return e.id === 'shaker'; }), 'data-shaker="1"']);
+  c.supps.forEach(function (m) { items.push([m.id, m.n, !!(f.meds && f.meds[m.id]), 'data-med="' + m.id + '"']); }); c.meds.forEach(function (m) { items.push([m.id, m.n, !!(f.meds && f.meds[m.id]), 'data-med="' + m.id + '"', 1]); });
+  var nOk = items.filter(function (x) { return x[2]; }).length, sDone = !!(ss.done || ss.rest && trainedToday()), wDone = f.water >= T.w, pDone = E.p >= M.p;
+  var goals = [sDone || !!ss.rest, wDone, pDone].concat(items.length ? [nOk === items.length] : []), gDone = goals.filter(Boolean).length;
+  h += '<div class="hhero"><div><small>' + new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase() + '</small><div class="d hh1">BONJOUR <span>' + esc(String(p.prenom).toUpperCase()) + '</span></div><div class="hsub">' + (gDone >= goals.length ? 'Journée bouclée. Bravo !' : gDone ? 'Encore ' + (goals.length - gDone) + ' objectif' + (goals.length - gDone > 1 ? 's' : '') + ' aujourd\'hui.' : 'Voici ta journée.') + '</div></div><div class="hring">' + ring(gDone, goals.length) + '<button type="button" data-upd="1" class="hupd2" aria-label="Mettre à jour l\'appli">⟳</button></div></div>';
+  h += '<div class="hsec"><div class="tlist">';
+  /* 1. séance */
+  if (ss.done) { var nx = nextSession(), NS = DATA[nx]; h += trow({ icon: 'dumb', col: '#FF7A1A', t: 'Séance faite', s: NS ? 'Prochaine : ' + nx + ' · ' + esc(NS.word).toLowerCase() + ', demain ou après' : esc(ss.txt), done: true, attr: 'data-go="suivi"', right: '<span class="tgo ghost">›</span>' }); }
+  else if (ss.rest) h += trow({ icon: 'moon', col: '#99F6E4', t: 'Repos actif', s: esc(ss.txt), attr: 'data-play="daily"', right: '<span class="tgo">▶</span>' });
+  else { var S = ss.s; h += trow({ icon: 'dumb', col: S.color, t: 'Séance ' + ss.L + ' · ' + esc(S.word).toLowerCase(), s: esc(S.time).toLowerCase() + ' · ' + S.ex.length + ' exercices' + (/allégée|légère/.test(recoWhy(ss.L)) ? ' · allégée' : ''), attr: 'data-startrun="' + ss.L + '"', right: '<span class="tgo">▶</span>' }); }
+  /* 2. compléments */
+  if (items.length) h += trow({ icon: 'pill', col: '#86EFAC', t: 'Compléments', s: items.map(function (x) { return (x[2] ? '✓ ' : '') + esc(x[1]); }).join(' · '), done: nOk === items.length, attr: 'data-hcx="1"', right: '<b class="tnum">' + nOk + '/' + items.length + '</b>',
+    extra: HOME.cx ? '<div class="tchips">' + items.map(function (x) { return '<button type="button" ' + x[3] + ' class="' + (x[2] ? 'on' : '') + '" style="' + (x[2] ? 'background:' + (x[4] ? '#C4B5FD' : '#86EFAC') : '') + '">' + (x[2] ? '✓ ' : '') + esc(x[1]) + '</button>'; }).join('') + '<button type="button" data-go="profil" class="tset">Régler</button></div>' : '' });
+  /* 3. eau */
+  h += trow({ icon: 'drop', col: '#BFDBFE', t: 'Eau', s: f.water + ' verre' + (f.water > 1 ? 's' : '') + ' sur ' + T.w, done: wDone, bar: f.water / T.w * 100, right: '<button type="button" data-water="-1" class="tpm" aria-label="Un verre de moins"' + (f.water ? '' : ' disabled') + '>−</button><button type="button" data-water="1" class="tpm dark" aria-label="Un verre de plus">+</button>' });
+  /* 4. repas */
+  h += trow({ icon: 'food', col: '#FDBA74', t: 'Repas', s: E.k + ' / ' + M.k + ' kcal · ' + E.p + ' / ' + M.p + ' g de protéines', done: pDone, bar: E.k / Math.max(1, M.k) * 100, right: '<button type="button" data-eat="1" class="tpm dark" aria-label="J\'ai mangé">+</button>' });
+  /* 5. à faire ponctuellement */
+  if (mesDue()) h += trow({ icon: 'ruler', col: '#FDE68A', t: 'Mes mesures de la semaine', s: 'Poids et tours · 2 minutes', attr: 'data-mesgo="1"', right: '<span class="tgo ghost">›</span>' });
+  var todo = CKQ.filter(function (q) { return !(ck.c || {})[q[0]]; })[0];
+  if (ck.q && todo) h += trow({ icon: 'chat', col: '#F9A8D4', t: todo[1], s: 'Je cale ta séance sur ta forme', right: '<button type="button" data-ckskip="1" class="tskip">passer</button>', extra: '<div class="tchips">' + todo[2].map(function (o) { return '<button type="button" data-ck="' + todo[0] + '|' + o[0] + '" style="background:' + o[2] + '">' + o[1] + '</button>'; }).join('') + '</div>' });
+  if (!f.posteSet) h += trow({ icon: 'home', col: '#E5E7EB', t: p.travail === 'classique' ? 'Ta journée aujourd\'hui' : 'Ton poste aujourd\'hui', s: 'J\'adapte l\'heure des repas', extra: '<div class="tchips">' + ['matin', 'apm', 'nuit', 'jour', 'repos'].map(function (k) { return '<button type="button" data-poste="' + k + '">' + POSTES[k].n + '</button>'; }).join('') + '</div>' });
+  var hr = new Date().getHours(), mobDone = ST.mob.some(function (t) { return dkey(new Date(t)) === dkey(); });
+  if (!mobDone) h += trow({ icon: 'moon', col: '#C7D2FE', t: hr < 17 && f.poste !== 'repos' ? 'Mobilité express' : 'Routine du soir', s: hr < 17 && f.poste !== 'repos' ? '5 minutes, debout ou assis' : '17 minutes, souplesse et détente', attr: 'data-play="' + (hr < 17 && f.poste !== 'repos' ? 'pc' : 'daily') + '"', right: '<span class="tgo ghost">▶</span>' });
+  h += '</div>';
+  if (f.posteSet) h += '<div style="text-align:center"><button type="button" data-unposte="1" class="hlnk" style="padding:0;color:#6B7280">' + (p.travail === 'classique' ? 'Journée : ' : 'Poste : ') + POSTES[f.poste].n + ' · changer</button></div>';
+  h += '</div>';
+  /* conseil du coach */
+  var tip = ck.msg || profTip(); var cc = coach(f).filter(function (m) { return m[0] !== 'MAINTENANT' && m[0] !== 'TON POSTE'; })[0]; if (!tip && cc) tip = cc[1];
+  if (tip) h += '<div class="hsec"><div class="tipc"><span class="d">LE CONSEIL DU COACH</span><p>' + esc(tip) + '</p></div></div>';
+  h += notifyCard() + bilanCard() + backupCard() + customSection();
+  return h; }
+document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('[data-hcx]'); if (!b || ev.target.closest('button')) return; HOME.cx = !HOME.cx; var y = window.scrollY; route(); window.scrollTo(0, y); });
+document.addEventListener('click', function (ev) { var r = ev.target.closest && ev.target.closest('.trow[data-startrun],.trow[data-go],.trow[data-play],.trow[data-mesgo]'); if (!r || ev.target.closest('button')) return; /* les gestionnaires existants lisent les boutons : on relaie */ var b = document.createElement('button'); Object.keys(r.dataset).forEach(function (k) { b.dataset[k] = r.dataset[k]; }); b.style.display = 'none'; r.appendChild(b); b.click(); b.remove(); });
 
 route();
 inviteBoot();
